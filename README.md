@@ -1,3 +1,0 @@
-# FFN project
-
-## ASD
