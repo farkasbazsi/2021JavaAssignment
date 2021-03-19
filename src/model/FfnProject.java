@@ -1,8 +1,10 @@
-package ffn.project;
+package model;
 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import javax.swing.*;
+import view.Board;
 
 public class FfnProject extends JFrame {
 
@@ -17,13 +19,15 @@ public class FfnProject extends JFrame {
     private final JPanel westPanel;
     private final JPanel eastPanel;
 
-    public FfnProject() {
+    public FfnProject() throws IOException {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setTitle("TAPS - Total Accurate Park Simulator");
 
         southPanel = new JPanel();
         southLabel = new JLabel();
-        centerPanel = new JPanel();
+
+        centerPanel = new Board();
+
         westPanel = new JPanel();
         eastPanel = new JPanel();
 
@@ -31,12 +35,11 @@ public class FfnProject extends JFrame {
         southPanel.setBackground(Color.LIGHT_GRAY);
 
         westPanel.setBackground(Color.gray);
-        westPanel.setPreferredSize(new Dimension(170, 100));
+        westPanel.setPreferredSize(new Dimension(170, 736));
 
         eastPanel.setBackground(Color.gray);
-        eastPanel.setPreferredSize(new Dimension(170, 100));
+        eastPanel.setPreferredSize(new Dimension(170, 736));
 
-        centerPanel.setBackground(new Color(152, 251, 152));
         centerPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 
         southPanel.add(southLabel);
@@ -62,10 +65,11 @@ public class FfnProject extends JFrame {
             exitConfirmation();
         });
 
-        setSize(1200, 850);
-        setLocationRelativeTo(null);
-        setVisible(true);
+        setSize(1080, 1920); //1200,850
         setResizable(false);
+        setLocationRelativeTo(null);
+        pack();
+        setVisible(true);
     }
 
     private void exitConfirmation() {
@@ -79,7 +83,7 @@ public class FfnProject extends JFrame {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         FfnProject project = new FfnProject();
     }
 
