@@ -33,7 +33,7 @@ public class FfnProject extends JFrame {
         fillWestPanel();
         eastPanel = new JPanel();
 
-        southLabel.setText("Hanyas a kabat");
+        updateSouthLabelText();
         southPanel.setBackground(Color.white);
 
         westPanel.setBackground(Color.LIGHT_GRAY);
@@ -72,6 +72,18 @@ public class FfnProject extends JFrame {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private void updateSouthLabelText() {
+        //temporary amounts
+        int money = 100000;
+        int visitors = 0;
+        int happinessLevel = 100;
+        int parkValue = 200;
+
+        southLabel.setText("Egyenleg: " + money + "Ft       Látogatók száma: "
+                + visitors + " fő       Boldogság szintje: " + happinessLevel
+                + "%        Park összértéke: " + parkValue + "Ft");
     }
 
     private void fillWestPanel() throws IOException {
