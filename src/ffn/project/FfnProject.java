@@ -58,11 +58,8 @@ public class FfnProject extends JFrame {
             }
         });
 
-        exitMenuItem.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                exitConfirmation();
-            }
+        exitMenuItem.addActionListener((ActionEvent event) -> {
+            exitConfirmation();
         });
 
         setSize(1200, 850);
