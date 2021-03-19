@@ -21,7 +21,7 @@ public class FfnProject extends JFrame {
     private final JPanel eastPanel;
 
     public FfnProject() throws IOException {
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setTitle("TAPS - Total Accurate Park Simulator");
 
         southPanel = new JPanel();
@@ -32,6 +32,7 @@ public class FfnProject extends JFrame {
         westPanel = new JPanel();
         fillWestPanel();
         eastPanel = new JPanel();
+        fillEastPanel();
 
         updateSouthLabelText();
         southPanel.setBackground(Color.white);
@@ -55,14 +56,14 @@ public class FfnProject extends JFrame {
         cp.add(westPanel, "West");
         cp.add(eastPanel, "East");
         cp.add(centerPanel, "Center");
-        /*
+        
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent event) {
                 exitConfirmation();
             }
         });
-         */
+        
         exitMenuItem.addActionListener((ActionEvent event) -> {
             exitConfirmation();
         });
@@ -72,6 +73,37 @@ public class FfnProject extends JFrame {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private void fillEastPanel() {
+        //unfinished
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(Color.LIGHT_GRAY);
+        eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.PAGE_AXIS));
+
+        JLabel eastLabel = new JLabel("Árak megadása");
+        eastLabel.setFont(new Font("Calibri", Font.BOLD, 16));
+        eastLabel.setPreferredSize(new Dimension(170, 80));
+        eastLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        JButton entranceFeebutton = new JButton();
+        entranceFeebutton.setText("Belépődíj");
+        entranceFeebutton.setPreferredSize(new Dimension(120, 40));
+        entranceFeebutton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        buttonPanel.add(entranceFeebutton);
+
+        JButton gamesFeebutton = new JButton();
+        gamesFeebutton.setText("Játék árak");
+        gamesFeebutton.setPreferredSize(new Dimension(120, 40));
+        buttonPanel.add(gamesFeebutton);
+
+        JButton workerFeebutton = new JButton();
+        workerFeebutton.setText("Dolgozói bérek");
+        workerFeebutton.setPreferredSize(new Dimension(120, 40));
+        buttonPanel.add(workerFeebutton);
+
+        eastPanel.add(eastLabel);
+        eastPanel.add(buttonPanel);
     }
 
     private void updateSouthLabelText() {
