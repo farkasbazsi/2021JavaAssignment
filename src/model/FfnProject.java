@@ -6,6 +6,7 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.*;
 import res.ResourceLoader;
 import model.building.*;
@@ -196,6 +197,17 @@ public class FfnProject extends JFrame {
                         + buildingList.get(i).getBUILDING_COST() + "Ft");
                 button.setContentAreaFilled(false);
                 button.setPreferredSize(new Dimension(70, 90));
+                
+                //if u try the listener with "i", it doesnt work
+                int iSubstitute=i;
+                button.addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        engine.building = buildingList.get(iSubstitute);
+                        //engine.placeBuilding = buildingList.get(iSubstitute).getName();
+                    }
+                });
+                
                 insertPanel.add(button);
             } else {
                 JButton button = new JButton();

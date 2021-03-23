@@ -3,8 +3,12 @@ package game;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import model.Payment;
@@ -28,9 +32,11 @@ public class GameEngine {
     private final Image road;
     private final int height = 23;
     private final int width = 25;
+    public Building building;
     
     //constructed with the centerPanel
     public GameEngine(JPanel panel) throws IOException{
+        building = null;
         grass = ResourceLoader.loadImage("res/grass.png");
         road = ResourceLoader.loadImage("res/road.png");
         tiles = new Tile[height][width];
@@ -46,6 +52,8 @@ public class GameEngine {
                     tiles[i][j] = new Tile(grass, 'G');
                 }
 
+                //more code will go here
+                
                 panel.add(tiles[i][j]);
             }
         }
