@@ -1,5 +1,6 @@
 package model;
 
+import game.GameEngine;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
@@ -7,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import javax.swing.*;
 import res.ResourceLoader;
-import view.Board;
 import model.building.*;
 
 public class FfnProject extends JFrame {
@@ -24,6 +24,8 @@ public class FfnProject extends JFrame {
     private final JPanel eastPanel;
 
     private final ArrayList<Building> buildingList = new ArrayList<>();
+    
+    private GameEngine engine;
 
     public FfnProject() throws IOException {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -32,8 +34,10 @@ public class FfnProject extends JFrame {
         southPanel = new JPanel();
         southLabel = new JLabel();
 
-        centerPanel = new Board();
-
+        //centerPanel = new Board();
+        centerPanel = new JPanel();
+        engine = new GameEngine(centerPanel);
+        
         read_buildings();
 
         westPanel = new JPanel();

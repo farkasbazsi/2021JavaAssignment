@@ -1,6 +1,6 @@
 /*
     The whole tiles matrix can be moved to the gameEngine!
- */
+ 
 package view;
 
 import java.awt.Color;
@@ -13,11 +13,8 @@ import model.Tile;
 
 public class Board extends JPanel {
 
-    private final Image grass;
-    private final Image road;
-    private final int height = 23;
-    private final int width = 25;
-    public Tile[][] tiles;
+    
+    
 
     public Board() throws IOException {
         grass = ResourceLoader.loadImage("res/grass.png");
@@ -40,3 +37,4 @@ public class Board extends JPanel {
         }
     }
 }
+*/

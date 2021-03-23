@@ -16,7 +16,7 @@ public class Tile extends JPanel {
         image = m;
         type = c;
 
-        //if you dont set the size here the whole center panel ggets fucked up -B
+        //if you dont set the size here the whole center panel gets fucked up
         this.setPreferredSize(new Dimension(32, 32));
     }
 
