@@ -5,8 +5,8 @@ import model.Details;
 public class TrashBin extends Building{
     private int fullness;
 
-    public TrashBin(Details details) {
-        super(details);
+    public TrashBin(Details details, int bcost, String name) {
+        super(details, bcost, name);
     }
     
     public boolean isFull(){

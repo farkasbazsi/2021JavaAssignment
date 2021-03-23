@@ -1,0 +1,16 @@
+roller_coaster roller.png 2 2 100 ride
+dojo dojo.png 1 2 80 ride
+carousel caro.png 2 1 70 ride
+target_shooting target.png 2 2 50 ride
+big_wheel wheel.png 2 1 100 ride
+bouncy_castle bouncy.png 1 1 30 ride
+light_rail rail.png 2 2 110 ride
+arcade_games arcade.png 2 2 100 ride
+haunted_castle haunted.png 2 2 90 ride
+buffet buffet.png 1 1 30 restaurant
+restaurant rest.png 2 2 60 restaurant
+toilet toilet.png 1 1 10 toilet
+trash_bin bin.png 1 1 10 trash
+tree tree.png 2 1 5 plant
+bush bush.png 1 1 5 plant
+road road.png 1 1 10 road

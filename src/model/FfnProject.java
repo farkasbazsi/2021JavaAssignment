@@ -2,10 +2,13 @@ package model;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
 import javax.swing.*;
 import res.ResourceLoader;
 import view.Board;
+import model.building.*;
 
 public class FfnProject extends JFrame {
 
@@ -20,6 +23,8 @@ public class FfnProject extends JFrame {
     private final JPanel westPanel;
     private final JPanel eastPanel;
 
+    private final ArrayList<Building> buildingList = new ArrayList<>();
+
     public FfnProject() throws IOException {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setTitle("TAPS - Total Accurate Park Simulator");
@@ -28,6 +33,8 @@ public class FfnProject extends JFrame {
         southLabel = new JLabel();
 
         centerPanel = new Board();
+
+        read_buildings();
 
         westPanel = new JPanel();
         fillWestPanel();
@@ -56,14 +63,14 @@ public class FfnProject extends JFrame {
         cp.add(westPanel, "West");
         cp.add(eastPanel, "East");
         cp.add(centerPanel, "Center");
-        
+
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent event) {
                 exitConfirmation();
             }
         });
-        
+
         exitMenuItem.addActionListener((ActionEvent event) -> {
             exitConfirmation();
         });
@@ -73,6 +80,53 @@ public class FfnProject extends JFrame {
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private void read_buildings() {
+        try {
+            File myObj = new File("src/game/buildings.txt");
+            Scanner myReader = new Scanner(myObj);
+            while (myReader.hasNextLine()) {
+                String name = myReader.next();
+                String img = myReader.next();
+                int height = myReader.nextInt();
+                int length = myReader.nextInt();
+                int cost = myReader.nextInt();
+                String type = myReader.next();
+
+                Details dt = new Details(img, height, length);
+
+                switch (type) {
+                    case "ride":
+                        Ride rd = new Ride(dt, cost, name);
+                        buildingList.add(rd);
+                        break;
+                    case "restaurant":
+                        Restaurant rt = new Restaurant(dt, cost, name);
+                        buildingList.add(rt);
+                        break;
+                    case "toilet":
+                        Toilet to = new Toilet(dt, cost, name);
+                        buildingList.add(to);
+                        break;
+                    case "trash":
+                        TrashBin tb = new TrashBin(dt, cost, name);
+                        buildingList.add(tb);
+                        break;
+                    case "plant":
+                        Plant pl = new Plant(dt, cost, name, 5);
+                        buildingList.add(pl);
+                        break;
+                    case "road":
+                        Road ro = new Road(dt, cost, name);
+                        buildingList.add(ro);
+                        break;
+                }
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+        }
     }
 
     private void fillEastPanel() {
@@ -128,12 +182,22 @@ public class FfnProject extends JFrame {
         buildingPanel.setLayout(new BorderLayout());
         insertPanel.setLayout(new GridLayout(row, column));
 
-        for (int i = 0; i < row; ++i) {
-            for (int j = 0; j < column; ++j) {
-                JButton button = new JButton();
+        for (int i = 0; i < column * row; ++i) {
+            if (i < buildingList.size()) {
+                Image icon;
+                icon = ResourceLoader.loadImage("res/" + buildingList.get(i).getDetails().image);
+                Image sized_icon = icon.getScaledInstance(64, 64, java.awt.Image.SCALE_SMOOTH);
+                JButton button = new JButton(new ImageIcon(sized_icon));
+                button.setToolTipText(buildingList.get(i).getName() + "     "
+                        + buildingList.get(i).getBUILDING_COST() + "Ft");
                 button.setContentAreaFilled(false);
+                button.setPreferredSize(new Dimension(70, 90));
+                insertPanel.add(button);
+            } else {
+                JButton button = new JButton();
                 button.setText("épület");
-                button.setPreferredSize(new Dimension(70, 80));
+                button.setPreferredSize(new Dimension(70, 90));
+                button.setContentAreaFilled(false);
                 insertPanel.add(button);
             }
         }
@@ -141,9 +205,9 @@ public class FfnProject extends JFrame {
         final Image bulldozer;
         bulldozer = ResourceLoader.loadImage("res/bulldozer.png");
 
-        Image newimg = bulldozer.getScaledInstance(64, 64, java.awt.Image.SCALE_SMOOTH);
+        Image sized_bulldozer = bulldozer.getScaledInstance(64, 64, java.awt.Image.SCALE_SMOOTH);
 
-        JButton Bbutton = new JButton(new ImageIcon(newimg));
+        JButton Bbutton = new JButton(new ImageIcon(sized_bulldozer));
         Bbutton.setContentAreaFilled(false);
 
         buildingPanel.add(BorderLayout.CENTER, new JScrollPane(insertPanel));

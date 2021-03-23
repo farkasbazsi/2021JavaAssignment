@@ -8,8 +8,8 @@ public class Ride extends Building{
     private int maxVisitors;
     private BuildingState currentState;
     
-    public Ride(Details details){
-        super(details);
+    public Ride(Details details, int bcost, String name){
+        super(details, bcost, name);
     }
     
     private void changeState() {

@@ -3,7 +3,15 @@ package model;
 import java.awt.Image;
 
 public class Details {
-    public Image image;
+
+    public String image;
     public int height;
     public int length;
+
+    public Details(String image, int height, int length) {
+        this.image = image;
+        this.height = height;
+        this.length = length;
+    }
+
 }
