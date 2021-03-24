@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import model.Payment;
@@ -95,6 +96,15 @@ public class GameEngine {
                                 }
                             }
                         }
+                    }
+                    
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        tiles[iSubstitute][jSubstitute].setBorder(BorderFactory.createLineBorder(Color.black));
+                    }
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        tiles[iSubstitute][jSubstitute].setBorder(BorderFactory.createEmptyBorder());
                     }
                 });
 
