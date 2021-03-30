@@ -58,50 +58,44 @@ public class GameEngine {
                 tiles[i][j].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        System.out.printf("'" + building.getName() + "'" + "\n");
-                        if (building != null && tiles[iSubstitute][jSubstitute].type == 'G') {
-                            int height = building.getDetails().height;
-                            int width = building.getDetails().length;
+                        if (building != null) {
+                            int buildingHeight = building.getDetails().height;
+                            int buildingWidth = building.getDetails().length;
 
-                            String name = building.getName();
-                            //MINDIG AZ ELSE AGBA FUT
-                            if (name.equals("restaurant")) {
-                                System.out.printf("HERE\n");
-                                if(tiles[iSubstitute+1][jSubstitute].type=='G' &&
-                                  tiles[iSubstitute][jSubstitute+1].type=='G' &&
-                                  tiles[iSubstitute+1][jSubstitute+1].type=='G'){
-                                    Image image;
-                                    image = grass;
-                                    try {
-                                        image = ResourceLoader.loadImage("res/" + building.getDetails().image);
-                                    } catch (IOException ex) {
-                                        Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                            if (iSubstitute + buildingHeight < height + 1
+                                    && jSubstitute + buildingWidth < width + 1) {
+                                //System.out.println(iSubstitute + " " + jSubstitute + " : " + buildingHeight + " " + buildingWidth);
+
+                                boolean free = true;
+                                for (int k = 0; k <= buildingHeight - 1; k++) {
+                                    for (int l = 0; l <= buildingWidth - 1; l++) {
+                                        if (tiles[iSubstitute + k][jSubstitute + l].type != 'G') {
+                                            free = false;
+                                        }
                                     }
-                                    tiles[iSubstitute][jSubstitute].image=image;
-                                    tiles[iSubstitute][jSubstitute].repaint();
-                                    tiles[iSubstitute+1][jSubstitute].image=image;
-                                    tiles[iSubstitute+1][jSubstitute].repaint();
-                                    tiles[iSubstitute][jSubstitute+1].image=image;
-                                    tiles[iSubstitute][jSubstitute+1].repaint();
-                                    tiles[iSubstitute+1][jSubstitute+1].image=image;
-                                    tiles[iSubstitute+1][jSubstitute+1].repaint();
                                 }
-                            }else{
-                                try {
-                                    tiles[iSubstitute][jSubstitute].image=
-                                            ResourceLoader.loadImage("res/" + building.getDetails().image);
-                                    tiles[iSubstitute][jSubstitute].repaint();
-                                } catch (IOException ex) {
-                                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                                if (free) {
+                                    for (int k = 0; k <= buildingHeight - 1; k++) {
+                                        for (int l = 0; l <= buildingWidth - 1; l++) {
+                                            try {
+                                                tiles[iSubstitute + k][jSubstitute + l].image
+                                                        = ResourceLoader.loadImage("res/" + building.getDetails().image);
+                                                tiles[iSubstitute + k][jSubstitute + l].repaint();
+                                            } catch (IOException ex) {
+                                                Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
-                    
+
                     @Override
                     public void mouseEntered(MouseEvent e) {
                         tiles[iSubstitute][jSubstitute].setBorder(BorderFactory.createLineBorder(Color.black));
                     }
+
                     @Override
                     public void mouseExited(MouseEvent e) {
                         tiles[iSubstitute][jSubstitute].setBorder(BorderFactory.createEmptyBorder());
