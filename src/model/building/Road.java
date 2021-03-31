@@ -9,6 +9,10 @@ public class Road extends Building{
         super(details, bcost, name);
     }
     
+    public Road(Road road) {
+        super(road.getDetails(), road.getBUILDING_COST(), road.getName());
+    }
+    
     public boolean hasTrashOnIt() {
         return trashOnIt;
     }

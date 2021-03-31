@@ -18,6 +18,12 @@ import model.Tile;
 import model.worker.Worker;
 import model.building.Building;
 import model.Visitor;
+import model.building.Plant;
+import model.building.Restaurant;
+import model.building.Ride;
+import model.building.Road;
+import model.building.Toilet;
+import model.building.TrashBin;
 import res.ResourceLoader;
 
 public class GameEngine {
@@ -34,6 +40,7 @@ public class GameEngine {
     private final int height = 23;
     private final int width = 25;
     private Building building;
+    private boolean destroy;
 
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel) throws IOException {
@@ -41,13 +48,14 @@ public class GameEngine {
         tiles = new Tile[height][width];
         modelTiles = new ModelTile[height][width];
         building = null;
+        destroy = false;
 
         generateField(panel);
     }
 
     /**
      * Generates the tiles matrix, and fills up the modelTiles matrix
-     * accordingly
+     * accordingly.
      *
      * @param panel, the panel to which the tiles matrix gets added
      * (centerPanel)
@@ -72,11 +80,13 @@ public class GameEngine {
     }
 
     /**
-     * Gets called, if the placement is correct (no overlapping, no outindexing)
-     * Searches in the buildings arrayList for a null element, if there is none,
-     * adds the bulding to the arrayList Sets the types(dojo, etc) and
-     * indexes(buildings arrayList index, showing the building itself) Changes
-     * the pictures of the correct tiles in the Tiles matrix & repaints them
+     * Gets called, if the placement is correct (no overlapping, no
+     * outindexing). Searches in the buildings arrayList for a null element, if
+     * there is none, adds a newly created element accordingly to the type. (if
+     * there is a null element, overwrites the given element). Sets the
+     * types(dojo, etc) and indexes(buildings arrayList index, showing the
+     * building itself). Changes the pictures of the correct tiles in the Tiles
+     * matrix & repaints them.
      *
      * @param iSubstitute, i index of matrixes
      * @param jSubstitute, j index of matrixes
@@ -86,13 +96,41 @@ public class GameEngine {
         int ind = -1;
         for (int i = 0; i < buildings.size(); i++) {
             if (buildings.get(i) == null) {
-                buildings.set(i, building);
+                if (building instanceof Ride) {
+                    buildings.set(i, new Ride((Ride) building));
+                } else if (building instanceof Restaurant) {
+                    buildings.set(i, new Restaurant((Restaurant) building));
+                } else if (building instanceof Toilet) {
+                    buildings.set(i, new Toilet((Toilet) building));
+                } else if (building instanceof TrashBin) {
+                    buildings.set(i, new TrashBin((TrashBin) building));
+                } else if (building instanceof Road) {
+                    buildings.set(i, new Road((Road) building));
+                } else if (building instanceof Plant) {
+                    buildings.set(i, new Plant((Plant) building));
+                } else {
+                    System.err.println("Can't find class");
+                }
                 full = false;
                 ind = i;
             }
         }
         if (full) {
-            buildings.add(building);
+            if (building instanceof Ride) {
+                buildings.add(new Ride((Ride) building));
+            } else if (building instanceof Restaurant) {
+                buildings.add(new Restaurant((Restaurant) building));
+            } else if (building instanceof Toilet) {
+                buildings.add(new Toilet((Toilet) building));
+            } else if (building instanceof TrashBin) {
+                buildings.add(new TrashBin((TrashBin) building));
+            } else if (building instanceof Road) {
+                buildings.add(new Road((Road) building));
+            } else if (building instanceof Plant) {
+                buildings.add(new Plant((Plant) building));
+            } else {
+                System.err.println("Can't find class");
+            }
             ind = buildings.size() - 1;
         }
         for (int k = 0; k <= building.getDetails().height - 1; k++) {
@@ -111,16 +149,47 @@ public class GameEngine {
         }
     }
 
-    private void removeBuilding(int id) {
-
+    /**
+     * Dont mind the road part, it will get patched later on!!! Works with a
+     * building's indexes. Changes the pictures in the tiles matrix to grass and
+     * repaints. Changes the types and indexes back to grass and -1 in the
+     * modelTiles matrix. Sets the given index in the buildings arrayList to
+     * null.
+     *
+     * @param iSubstitute, i index of matrixes
+     * @param jSubstitute, j index of matrixes
+     */
+    private void removeBuilding(int iSubstitute, int jSubstitute) {
+        if ("road".equals(modelTiles[iSubstitute][jSubstitute].getType())) {
+            try {
+                tiles[iSubstitute][jSubstitute].setImage(ResourceLoader.loadImage("res/grass.png"));
+            } catch (IOException ex) {
+                Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            tiles[iSubstitute][jSubstitute].repaint();
+            modelTiles[iSubstitute][jSubstitute].setType("grass");
+        } else {
+            /*for (Point i : buildings.get(modelTiles[iSubstitute][jSubstitute].getIndex()).getIndexes()) {
+                        System.out.println(i.toString() + "\n");
+                    }*/
+            //A ROADON VALTOZTATNI KELL ?AZ IS "EPITMENY", EZT MAJD KESOBB PATCHALEM
+            int tempIndex = modelTiles[iSubstitute][jSubstitute].getIndex();
+            for (Point i : buildings.get(modelTiles[iSubstitute][jSubstitute].getIndex()).getIndexes()) {
+                try {
+                    tiles[(int) i.getX()][(int) i.getY()].setImage(ResourceLoader.loadImage("res/grass.png"));
+                } catch (IOException ex) {
+                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                tiles[(int) i.getX()][(int) i.getY()].repaint();
+                modelTiles[(int) i.getX()][(int) i.getY()].setType("grass");
+                modelTiles[(int) i.getX()][(int) i.getY()].setIndex(-1);
+            }
+            buildings.set(tempIndex, null);
+        }
     }
 
     private void newGame() {
 
-    }
-
-    public void setBuilding(Building building) {
-        this.building = building;
     }
 
     private void exit() {
@@ -136,8 +205,7 @@ public class GameEngine {
     }
 
     /**
-     * Class for the event handling. Its main function is validating building
-     * placements.
+     * Nested class for event handling
      */
     class mouseListener extends MouseAdapter {
 
@@ -149,13 +217,17 @@ public class GameEngine {
         }
 
         /**
-         *Handles the validation of building placement
+         * Handles the validation of building placement. Handles the validation
+         * of a building destruction.
+         *
          * @param e
          */
         @Override
         public void mouseClicked(MouseEvent e) {
             //System.out.println(modelTiles[iSubstitute][jSubstitute].getIndex() + " " + modelTiles[iSubstitute][jSubstitute].getType());
-            if (building != null) {
+            if (destroy && !"grass".equals(modelTiles[iSubstitute][jSubstitute].getType())) {
+                removeBuilding(iSubstitute, jSubstitute);
+            } else if (building != null) {
 
                 if (iSubstitute + building.getDetails().height < height + 1
                         && jSubstitute + building.getDetails().length < width + 1) {
@@ -185,5 +257,13 @@ public class GameEngine {
         public void mouseExited(MouseEvent e) {
             tiles[iSubstitute][jSubstitute].setBorder(BorderFactory.createEmptyBorder());
         }
+    }
+
+    public void setBuilding(Building building) {
+        this.building = building;
+    }
+
+    public void setDestroy(boolean destroy) {
+        this.destroy = destroy;
     }
 }

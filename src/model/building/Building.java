@@ -17,7 +17,7 @@ public abstract class Building {
         this.name = name;
         this.indexes = new ArrayList<>();
     }
-
+    
     public Details getDetails() {
         return details;
     }

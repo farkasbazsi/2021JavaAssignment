@@ -222,6 +222,12 @@ public class FfnProject extends JFrame {
         Image sized_bulldozer = bulldozer.getScaledInstance(64, 64, java.awt.Image.SCALE_SMOOTH);
 
         JButton Bbutton = new JButton(new ImageIcon(sized_bulldozer));
+        Bbutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                engine.setDestroy(true);
+            }
+        });
         Bbutton.setContentAreaFilled(false);
 
         buildingPanel.add(BorderLayout.CENTER, new JScrollPane(insertPanel));

@@ -25,6 +25,7 @@ public class Tile extends JPanel {
 
     public void setImage(Image image) {
         this.image = image;
+        this.setPreferredSize(new Dimension(32, 32));
     }
 
 }

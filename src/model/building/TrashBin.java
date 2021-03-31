@@ -9,6 +9,10 @@ public class TrashBin extends Building{
         super(details, bcost, name);
     }
     
+    public TrashBin(TrashBin trashbin) {
+        super(trashbin.getDetails(), trashbin.getBUILDING_COST(), trashbin.getName());
+    }
+    
     public boolean isFull(){
         return fullness == 100;
     }

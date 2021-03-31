@@ -12,6 +12,10 @@ public class Ride extends Building{
         super(details, bcost, name);
     }
     
+    public Ride(Ride ride) {
+        super(ride.getDetails(), ride.getBUILDING_COST(), ride.getName());
+    }
+      
     private void changeState() {
         currentState = BuildingState.BUILDING;
     }
