@@ -8,8 +8,7 @@ import javax.swing.JPanel;
 
 public class Tile extends JPanel {
 
-    //public, for now
-    public Image image;
+    private Image image;
 
     public Tile(Image m) {
         image = m;
@@ -23,4 +22,9 @@ public class Tile extends JPanel {
         Graphics2D gr = (Graphics2D) g;
         g.drawImage(image, 0, 0, 32, 32, this);
     }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
 }

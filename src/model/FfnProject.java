@@ -34,7 +34,6 @@ public class FfnProject extends JFrame {
         southPanel = new JPanel();
         southLabel = new JLabel();
 
-        //centerPanel = new Board();
         centerPanel = new JPanel();
         engine = new GameEngine(centerPanel);
 
@@ -197,13 +196,13 @@ public class FfnProject extends JFrame {
                 button.setContentAreaFilled(false);
                 button.setPreferredSize(new Dimension(70, 90));
 
+                //on action, the building that we want to place gets stored in the engine
                 //if u try the listener with "i", it doesnt work
                 int iSubstitute = i;
                 button.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        engine.building = buildingList.get(iSubstitute);
-                        //engine.placeBuilding = buildingList.get(iSubstitute).getName();
+                        engine.setBuilding(buildingList.get(iSubstitute));
                     }
                 });
 
