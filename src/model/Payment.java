@@ -1,7 +1,7 @@
 package model;
 
 public class Payment {
-    public void setWorkerSalary(int id, int amount){
+    public void setWorkerSalary(int amount){
         
     }
     
@@ -9,11 +9,15 @@ public class Payment {
         
     }
     
-    public void setRestaurantPrice(int id, int amount){
+    public void setRestaurantPrice(int amount){
         
     }
     
     public void setToiletPrice(int amount){
+        
+    }
+    
+    public void setGamesPrice(int amount) {
         
     }
 }
