@@ -65,8 +65,6 @@ public class GameEngine {
                     tiles[i][j] = new Tile(ResourceLoader.loadImage("res/grass.png"));
                 }
 
-                int iSubstitute = i;
-                int jSubstitute = j;
                 tiles[i][j].addMouseListener(new mouseListener(i, j));
                 panel.add(tiles[i][j]);
             }
@@ -156,7 +154,7 @@ public class GameEngine {
          */
         @Override
         public void mouseClicked(MouseEvent e) {
-            System.out.println(modelTiles[iSubstitute][jSubstitute].getIndex() + " " + modelTiles[iSubstitute][jSubstitute].getType());
+            //System.out.println(modelTiles[iSubstitute][jSubstitute].getIndex() + " " + modelTiles[iSubstitute][jSubstitute].getType());
             if (building != null) {
 
                 if (iSubstitute + building.getDetails().height < height + 1
