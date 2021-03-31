@@ -7,6 +7,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
 import javax.swing.*;
+import javax.swing.border.*;
 import res.ResourceLoader;
 import model.building.*;
 
@@ -25,7 +26,10 @@ public class FfnProject extends JFrame {
 
     private final ArrayList<Building> buildingList = new ArrayList<>();
 
-    private GameEngine engine;
+    private ArrayList<String> freeGames = new ArrayList<>();
+    private Timer playTimer;
+
+    private final GameEngine engine;
 
     public FfnProject() throws IOException {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -78,11 +82,21 @@ public class FfnProject extends JFrame {
             exitConfirmation();
         });
 
+        playTimer = new Timer(100, new playTimerListener());
+        playTimer.start();
         setSize(1080, 1920); //1200,850
         setResizable(false);
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    class playTimerListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent ae) {
+            updateSouthLabelText();
+        }
     }
 
     private void read_buildings() {
@@ -133,9 +147,18 @@ public class FfnProject extends JFrame {
     }
 
     private void fillEastPanel() {
-        //unfinished
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.LIGHT_GRAY);
+        JPanel checkPanel = new JPanel();
+        checkPanel.setBackground(Color.LIGHT_GRAY);
+        checkPanel.setPreferredSize(new Dimension(170, 150));
+        JLabel checkLabel = new JLabel("<html><div style='text-align: center;'>"
+                + "A belépődíj<br>az alábbi játékokat<br>tartalmazza</html>");
+        Border border = checkLabel.getBorder();
+        Border margin = new EmptyBorder(10, 10, 10, 10);
+        checkLabel.setBorder(new CompoundBorder(border, margin));
+        checkPanel.add(checkLabel);
+
         eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.PAGE_AXIS));
 
         JLabel eastLabel = new JLabel("Árak megadása");
@@ -146,33 +169,60 @@ public class FfnProject extends JFrame {
         JButton entranceFeebutton = new JButton();
         entranceFeebutton.setText("Belépődíj");
         entranceFeebutton.setPreferredSize(new Dimension(120, 40));
-        entranceFeebutton.setAlignmentX(Component.CENTER_ALIGNMENT);
         buttonPanel.add(entranceFeebutton);
-
-        JButton gamesFeebutton = new JButton();
-        gamesFeebutton.setText("Játék árak");
-        gamesFeebutton.setPreferredSize(new Dimension(120, 40));
-        buttonPanel.add(gamesFeebutton);
 
         JButton workerFeebutton = new JButton();
         workerFeebutton.setText("Dolgozói bérek");
         workerFeebutton.setPreferredSize(new Dimension(120, 40));
         buttonPanel.add(workerFeebutton);
 
+        JButton gamesFeebutton = new JButton();
+        gamesFeebutton.setText("Játékok árai");
+        gamesFeebutton.setPreferredSize(new Dimension(120, 40));
+        buttonPanel.add(gamesFeebutton);
+
+        JButton restaurantFeebutton = new JButton();
+        restaurantFeebutton.setText("Éttermek árai");
+        restaurantFeebutton.setPreferredSize(new Dimension(120, 40));
+        buttonPanel.add(restaurantFeebutton);
+
+        JButton toiletFeebutton = new JButton();
+        toiletFeebutton.setText("Mosdó ára");
+        toiletFeebutton.setPreferredSize(new Dimension(120, 40));
+        buttonPanel.add(toiletFeebutton);
+
+        for (int i = 0; i < 9; i++) {
+            JCheckBox cb = new JCheckBox(buildingList.get(i).getName());
+            cb.setBackground(Color.LIGHT_GRAY);
+            cb.setPreferredSize(new Dimension(150, 20));
+
+            cb.addItemListener((ItemEvent arg0) -> {
+                if (cb.isSelected()) {
+                    freeGames.add(cb.getText());
+                } else {
+                    freeGames.remove(cb.getText());
+                }
+                //System.out.println(freeGames);
+            });
+
+            checkPanel.add(cb);
+        }
+
+        JButton openbutton = new JButton();
+        openbutton.setText("Park megnyitása");
+        openbutton.setPreferredSize(new Dimension(100, 40));
+        openbutton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
         eastPanel.add(eastLabel);
         eastPanel.add(buttonPanel);
+        eastPanel.add(checkPanel);
+        eastPanel.add(openbutton);
     }
 
     private void updateSouthLabelText() {
-        //temporary amounts
-        int money = 100000;
-        int visitors = 0;
-        int happinessLevel = 100;
-        int parkValue = 200;
-
-        southLabel.setText("Egyenleg: " + money + "Ft       Látogatók száma: "
-                + visitors + " fő       Boldogság szintje: " + happinessLevel
-                + "%        Park összértéke: " + parkValue + "Ft");
+        southLabel.setText("Egyenleg: " + engine.getMoney() + "Ft       Látogatók száma: "
+                + engine.getVisitorsCount() + " fő       Boldogság szintje: " + engine.getAvgHappiness()
+                + "%        Park összértéke: " + engine.getParkValue() + "Ft");
     }
 
     private void fillWestPanel() throws IOException {
@@ -195,7 +245,6 @@ public class FfnProject extends JFrame {
                         + buildingList.get(i).getBUILDING_COST() + "Ft");
                 button.setContentAreaFilled(false);
                 button.setPreferredSize(new Dimension(70, 90));
-
                 //on action, the building that we want to place gets stored in the engine
                 //if u try the listener with "i", it doesnt work
                 int iSubstitute = i;

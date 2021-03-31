@@ -8,6 +8,10 @@ public class Visitor {
     public Visitor(Details details){
         this.details = details;
     }
+
+    public int getHappiness() {
+        return happiness;
+    }
     
     private void findPath(){
         

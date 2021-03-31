@@ -29,10 +29,10 @@ import res.ResourceLoader;
 public class GameEngine {
 
     private Timer timer;
-    private Integer money;
-    private ArrayList<Worker> workers;
+    private int money;
+    private ArrayList<Worker> workers = new ArrayList<>();
     private ArrayList<Building> buildings;
-    private ArrayList<Visitor> visitors;
+    private ArrayList<Visitor> visitors = new ArrayList<>();
     private Payment payment;
 
     private ModelTile[][] modelTiles;
@@ -44,6 +44,7 @@ public class GameEngine {
 
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel) throws IOException {
+        this.money = 10000;
         buildings = new ArrayList<>();
         tiles = new Tile[height][width];
         modelTiles = new ModelTile[height][width];
@@ -149,6 +150,7 @@ public class GameEngine {
         }
     }
 
+
     /**
      * Dont mind the road part, it will get patched later on!!! Works with a
      * building's indexes. Changes the pictures in the tiles matrix to grass and
@@ -186,6 +188,35 @@ public class GameEngine {
             }
             buildings.set(tempIndex, null);
         }
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public int getVisitorsCount() {
+        return visitors.size();
+    }
+
+    public int getAvgHappiness() {
+        if (visitors.isEmpty()) {
+            return 100;
+        }
+        int sum = 0;
+        for (Visitor visitor : visitors) {
+            sum += visitor.getHappiness();
+        }
+        return sum / visitors.size();
+    }
+
+    public int getParkValue() {
+        int sum = 0;
+        for (Building build : buildings) {
+            if(build != null){
+                sum += build.getBUILDING_COST();   
+            }
+        }
+        return sum;
     }
 
     private void newGame() {
@@ -229,20 +260,23 @@ public class GameEngine {
                 removeBuilding(iSubstitute, jSubstitute);
             } else if (building != null) {
 
-                if (iSubstitute + building.getDetails().height < height + 1
-                        && jSubstitute + building.getDetails().length < width + 1) {
-                    //System.out.println(iSubstitute + " " + jSubstitute + " : " + buildingHeight + " " + buildingWidth);
+                if (money - building.getBUILDING_COST() >= 0) {
+                    if (iSubstitute + building.getDetails().height < height + 1
+                            && jSubstitute + building.getDetails().length < width + 1) {
+                        //System.out.println(iSubstitute + " " + jSubstitute + " : " + buildingHeight + " " + buildingWidth);
 
-                    boolean free = true;
-                    for (int k = 0; k <= building.getDetails().height - 1; k++) {
-                        for (int l = 0; l <= building.getDetails().length - 1; l++) {
-                            if (!"grass".equals(modelTiles[iSubstitute + k][jSubstitute + l].getType())) {
-                                free = false;
+                        boolean free = true;
+                        for (int k = 0; k <= building.getDetails().height - 1; k++) {
+                            for (int l = 0; l <= building.getDetails().length - 1; l++) {
+                                if (!"grass".equals(modelTiles[iSubstitute + k][jSubstitute + l].getType())) {
+                                    free = false;
+                                }
                             }
                         }
-                    }
-                    if (free) {
-                        createBuilding(iSubstitute, jSubstitute);
+                        if (free) {
+                            createBuilding(iSubstitute, jSubstitute);
+                            money -= building.getBUILDING_COST();
+                        }
                     }
                 }
             }
