@@ -3,6 +3,7 @@ package game;
 import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -12,6 +13,7 @@ import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import model.ModelTile;
 import model.Payment;
 import model.Tile;
 import model.worker.Worker;
@@ -28,6 +30,7 @@ public class GameEngine {
     private ArrayList<Visitor> visitors;
     private Payment payment;
 
+    public ModelTile[][] modelTiles;
     public Tile[][] tiles;
     private final Image grass;
     private final Image road;
@@ -37,10 +40,12 @@ public class GameEngine {
 
     //constructed with the centerPanel
     public GameEngine(JPanel panel) throws IOException {
+        buildings = new ArrayList<>();
         building = null;
         grass = ResourceLoader.loadImage("res/grass.png");
         road = ResourceLoader.loadImage("res/road.png");
         tiles = new Tile[height][width];
+        modelTiles = new ModelTile[height][width];
 
         panel.setBackground(Color.red);
 
@@ -48,9 +53,11 @@ public class GameEngine {
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (i == 22 && j == 12) {
-                    tiles[i][j] = new Tile(road, 'R');
+                    modelTiles[i][j] = new ModelTile("road");
+                    tiles[i][j] = new Tile(road);
                 } else {
-                    tiles[i][j] = new Tile(grass, 'G');
+                    modelTiles[i][j] = new ModelTile("grass");
+                    tiles[i][j] = new Tile(grass);
                 }
 
                 int iSubstitute = i;
@@ -58,6 +65,7 @@ public class GameEngine {
                 tiles[i][j].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
+                        //System.out.println(modelTiles[iSubstitute][jSubstitute].getIndex() + " " + modelTiles[iSubstitute][jSubstitute].getType());
                         if (building != null) {
                             int buildingHeight = building.getDetails().height;
                             int buildingWidth = building.getDetails().length;
@@ -69,17 +77,34 @@ public class GameEngine {
                                 boolean free = true;
                                 for (int k = 0; k <= buildingHeight - 1; k++) {
                                     for (int l = 0; l <= buildingWidth - 1; l++) {
-                                        if (tiles[iSubstitute + k][jSubstitute + l].type != 'G') {
+                                        if (!"grass".equals(modelTiles[iSubstitute + k][jSubstitute + l].getType())) {
                                             free = false;
                                         }
                                     }
                                 }
                                 if (free) {
+                                    boolean full = true;
+                                    int ind = -1;
+                                    for (int i = 0; i < buildings.size(); i++) {
+                                        if (buildings.get(i) == null) {
+                                            buildings.set(i, building);
+                                            full = false;
+                                            ind = i;
+                                        }
+                                    }
+                                    if (full) {
+                                        buildings.add(building);
+                                        ind = buildings.size() - 1;
+                                    }
                                     for (int k = 0; k <= buildingHeight - 1; k++) {
                                         for (int l = 0; l <= buildingWidth - 1; l++) {
                                             try {
+                                                buildings.get(ind).getIndexes().add(new Point(iSubstitute + k, jSubstitute + l));
+                                                modelTiles[iSubstitute + k][jSubstitute + l].setType(building.getName());
+                                                modelTiles[iSubstitute + k][jSubstitute + l].setIndex(ind);
                                                 tiles[iSubstitute + k][jSubstitute + l].image
-                                                        = ResourceLoader.loadImage("res/" + building.getDetails().image);
+                                                        = ResourceLoader.loadImage("res/" + buildings.get(ind).getDetails().image);//+ building.getDetails().image);
+                                                //tiles[iSubstitute + k][jSubstitute + l].type=building.getName();
                                                 tiles[iSubstitute + k][jSubstitute + l].repaint();
                                             } catch (IOException ex) {
                                                 Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);

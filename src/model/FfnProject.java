@@ -6,7 +6,6 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.concurrent.atomic.AtomicReference;
 import javax.swing.*;
 import res.ResourceLoader;
 import model.building.*;
@@ -25,7 +24,7 @@ public class FfnProject extends JFrame {
     private final JPanel eastPanel;
 
     private final ArrayList<Building> buildingList = new ArrayList<>();
-    
+
     private GameEngine engine;
 
     public FfnProject() throws IOException {
@@ -38,7 +37,7 @@ public class FfnProject extends JFrame {
         //centerPanel = new Board();
         centerPanel = new JPanel();
         engine = new GameEngine(centerPanel);
-        
+
         read_buildings();
 
         westPanel = new JPanel();
@@ -197,9 +196,9 @@ public class FfnProject extends JFrame {
                         + buildingList.get(i).getBUILDING_COST() + "Ft");
                 button.setContentAreaFilled(false);
                 button.setPreferredSize(new Dimension(70, 90));
-                
+
                 //if u try the listener with "i", it doesnt work
-                int iSubstitute=i;
+                int iSubstitute = i;
                 button.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
@@ -207,7 +206,7 @@ public class FfnProject extends JFrame {
                         //engine.placeBuilding = buildingList.get(iSubstitute).getName();
                     }
                 });
-                
+
                 insertPanel.add(button);
             } else {
                 JButton button = new JButton();

@@ -10,11 +10,9 @@ public class Tile extends JPanel {
 
     //public, for now
     public Image image;
-    public char type;
 
-    public Tile(Image m, char c) {
+    public Tile(Image m) {
         image = m;
-        type = c;
 
         //if you dont set the size here the whole center panel gets fucked up
         this.setPreferredSize(new Dimension(32, 32));
