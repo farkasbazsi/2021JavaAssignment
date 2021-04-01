@@ -6,6 +6,8 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.border.*;
 import res.ResourceLoader;
@@ -333,15 +335,36 @@ public class FfnProject extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (engine.isDestroy()) {
                     engine.setDestroy(false);
+                    //centerPanel.setCursor(Cursor.getDefaultCursor());
                     Bbutton.setBackground(null);
                 } else if (engine.getBuilding() != null) {
                     engine.setBuilding(null);
                     buttons.get(chosenIndex).setBackground(null);
                     engine.setDestroy(true);
+                    /*
+                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+                    try {
+                        //Cursor c = toolkit.createCustomCursor(ResourceLoader.loadImage("res/delete.ani"),new Point(centerPanel.getX(),centerPanel.getY()), "img");
+                        Cursor c = toolkit.createCustomCursor(ResourceLoader.loadImage("res/delete.ani"),new Point(0, 0),"img");
+                        centerPanel.setCursor(c);
+                    } catch (IOException ex) {
+                        Logger.getLogger(FfnProject.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    */
                     Bbutton.setBackground(Color.red.brighter());
                     Bbutton.setOpaque(true);
                 } else {
                     engine.setDestroy(true);
+                    /*
+                    Toolkit toolkit = Toolkit.getDefaultToolkit();
+                    try {
+                        //Cursor c = toolkit.createCustomCursor(ResourceLoader.loadImage("res/delete.ani"),new Point(centerPanel.getX(),centerPanel.getY()), "img");
+                        Cursor c = toolkit.createCustomCursor(ResourceLoader.loadImage("res/delete.ani"),new Point(0, 0),"img");
+                        centerPanel.setCursor(c);
+                    } catch (IOException ex) {
+                        Logger.getLogger(FfnProject.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    */
                     Bbutton.setBackground(Color.red.brighter());
                     Bbutton.setOpaque(true);
                 }

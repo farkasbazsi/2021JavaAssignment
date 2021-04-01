@@ -256,7 +256,7 @@ public class GameEngine {
                 }
             }
             System.out.println("----------");*/
-            //System.out.println(modelTiles[iSubstitute][jSubstitute].getIndex() + " " + modelTiles[iSubstitute][jSubstitute].getType());
+            System.out.println(modelTiles[iSubstitute][jSubstitute].getIndex() + " " + modelTiles[iSubstitute][jSubstitute].getType());
             if (destroy && !"grass".equals(modelTiles[iSubstitute][jSubstitute].getType())) {
                 if (iSubstitute != 22 || jSubstitute != 12) {
                     removeBuilding(iSubstitute, jSubstitute);
