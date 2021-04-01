@@ -1,17 +1,25 @@
-image: java:latest
+image: ubuntu:20.10
 
 stages:
-    - build
-    - test
+  - build
+  - test
 
-build:
-    stage: build
-    script:
-        - ant compile
-        - ant jar
+before_script:
+  - apt-get update -yqq
+  - apt-get install -yqq openjdk-15-jdk ant junit4
+  
+# Build
+build_game:
+  stage: build
+  script:
+    - ant compile
+    - ant jar
 
-test:
-    stage: test
-    script:
-        - ant test
-
+# Test
+test_model:
+  stage: test
+  script:
+    - >
+      ant test
+      -Dlibs.junit_4.classpath=/usr/share/java/junit4.jar
+      -Dlibs.hamcrest.classpath=/usr/share/java/hamcrest-core.jar
