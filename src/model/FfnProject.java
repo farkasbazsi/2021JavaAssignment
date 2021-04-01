@@ -25,12 +25,14 @@ public class FfnProject extends JFrame {
     private final JPanel eastPanel;
 
     private final ArrayList<Building> buildingList = new ArrayList<>();
+    private ArrayList<JButton> buttons = new ArrayList<>();
+    private int chosenIndex;
 
     private ArrayList<String> freeGames = new ArrayList<>();
     private Timer playTimer;
     private Payment payment;
 
-    private final GameEngine engine;
+    private GameEngine engine;
 
     public FfnProject() throws IOException {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -40,7 +42,7 @@ public class FfnProject extends JFrame {
         southLabel = new JLabel();
 
         centerPanel = new JPanel();
-        engine = new GameEngine(centerPanel);
+        //engine = new GameEngine(centerPanel);
 
         payment = new Payment();
         read_buildings();
@@ -274,6 +276,9 @@ public class FfnProject extends JFrame {
 
         for (int i = 0; i < column * row; ++i) {
             if (i < buildingList.size()) {
+                if ("road".equals(buildingList.get(i).getName())) {
+                    engine = new GameEngine(centerPanel, buildingList.get(i));
+                }
                 Image icon;
                 icon = ResourceLoader.loadImage("res/" + buildingList.get(i).getDetails().image);
                 Image sized_icon = icon.getScaledInstance(64, 64, java.awt.Image.SCALE_SMOOTH);
@@ -282,16 +287,31 @@ public class FfnProject extends JFrame {
                         + buildingList.get(i).getBUILDING_COST() + "Ft");
                 button.setContentAreaFilled(false);
                 button.setPreferredSize(new Dimension(70, 90));
-                //on action, the building that we want to place gets stored in the engine
                 //if u try the listener with "i", it doesnt work
                 int iSubstitute = i;
                 button.addActionListener(new ActionListener() {
                     @Override
                     public void actionPerformed(ActionEvent e) {
-                        engine.setBuilding(buildingList.get(iSubstitute));
+                        if (engine.getBuilding() == buildingList.get(iSubstitute)) {
+                            engine.setBuilding(null);
+                            button.setBackground(null);
+                        } else if (engine.getBuilding() == null) {
+                            button.setBackground(Color.green.brighter());
+                            button.setOpaque(true);
+                            engine.setBuilding(buildingList.get(iSubstitute));
+                            chosenIndex = iSubstitute;
+                            engine.setDestroy(false);
+                            buttons.get(buttons.size() - 1).setBackground(null);
+                        } else {
+                            buttons.get(chosenIndex).setBackground(null);
+                            button.setBackground(Color.green.brighter());
+                            button.setOpaque(true);
+                            engine.setBuilding(buildingList.get(iSubstitute));
+                            chosenIndex = iSubstitute;
+                        }
                     }
                 });
-
+                buttons.add(button);
                 insertPanel.add(button);
             } else {
                 JButton button = new JButton();
@@ -311,9 +331,25 @@ public class FfnProject extends JFrame {
         Bbutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                engine.setDestroy(true);
+                if (engine.isDestroy()) {
+                    engine.setDestroy(false);
+                    Bbutton.setBackground(null);
+                } else if (engine.getBuilding() != null) {
+                    engine.setBuilding(null);
+                    buttons.get(chosenIndex).setBackground(null);
+                    engine.setDestroy(true);
+                    Bbutton.setBackground(Color.red.brighter());
+                    Bbutton.setOpaque(true);
+                } else {
+                    engine.setDestroy(true);
+                    Bbutton.setBackground(Color.red.brighter());
+                    Bbutton.setOpaque(true);
+                }
+
             }
         });
+        buttons.add(Bbutton);
+
         Bbutton.setContentAreaFilled(false);
 
         buildingPanel.add(BorderLayout.CENTER, new JScrollPane(insertPanel));
