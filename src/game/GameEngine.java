@@ -150,7 +150,6 @@ public class GameEngine {
         }
     }
 
-
     /**
      * Dont mind the road part, it will get patched later on!!! Works with a
      * building's indexes. Changes the pictures in the tiles matrix to grass and
@@ -212,8 +211,8 @@ public class GameEngine {
     public int getParkValue() {
         int sum = 0;
         for (Building build : buildings) {
-            if(build != null){
-                sum += build.getBUILDING_COST();   
+            if (build != null) {
+                sum += build.getBUILDING_COST();
             }
         }
         return sum;
@@ -299,5 +298,13 @@ public class GameEngine {
 
     public void setDestroy(boolean destroy) {
         this.destroy = destroy;
+    }
+
+    public Building getBuilding() {
+        return building;
+    }
+
+    public boolean isDestroy() {
+        return destroy;
     }
 }
