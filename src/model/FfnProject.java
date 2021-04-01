@@ -31,7 +31,7 @@ public class FfnProject extends JFrame {
     private ArrayList<String> freeGames = new ArrayList<>();
     private Timer playTimer;
 
-    private final GameEngine engine;
+    private GameEngine engine;
 
     public FfnProject() throws IOException {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -41,7 +41,7 @@ public class FfnProject extends JFrame {
         southLabel = new JLabel();
 
         centerPanel = new JPanel();
-        engine = new GameEngine(centerPanel);
+        //engine = new GameEngine(centerPanel);
 
         read_buildings();
 
@@ -239,6 +239,9 @@ public class FfnProject extends JFrame {
 
         for (int i = 0; i < column * row; ++i) {
             if (i < buildingList.size()) {
+                if ("road".equals(buildingList.get(i).getName())) {
+                    engine = new GameEngine(centerPanel, buildingList.get(i));
+                }
                 Image icon;
                 icon = ResourceLoader.loadImage("res/" + buildingList.get(i).getDetails().image);
                 Image sized_icon = icon.getScaledInstance(64, 64, java.awt.Image.SCALE_SMOOTH);

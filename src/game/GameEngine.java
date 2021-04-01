@@ -43,7 +43,7 @@ public class GameEngine {
     private boolean destroy;
 
     //gets called after the centerPanel in FfnProject.java
-    public GameEngine(JPanel panel) throws IOException {
+    public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
         this.money = 10000;
         buildings = new ArrayList<>();
         tiles = new Tile[height][width];
@@ -51,23 +51,26 @@ public class GameEngine {
         building = null;
         destroy = false;
 
-        generateField(panel);
+        generateField(panel, spawnRoad);
     }
 
     /**
      * Generates the tiles matrix, and fills up the modelTiles matrix
-     * accordingly.
+     * accordingly. Places down the spawning road(undestroyable).
      *
-     * @param panel, the panel to which the tiles matrix gets added
-     * (centerPanel)
+     * @param panelthe panel to which the tiles matrix gets added (centerpanel.)
+     * @param spawnRoad an object of a road to form the first road
      * @throws IOException , if the ResourceLoader can't find the pictures
      */
-    private void generateField(JPanel panel) throws IOException {
+    private void generateField(JPanel panel, Building spawnRoad) throws IOException {
         panel.setLayout(new GridLayout(height, width));
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
                 if (i == 22 && j == 12) {
+                    buildings.add(new Road((Road) spawnRoad));
                     modelTiles[i][j] = new ModelTile("road");
+                    modelTiles[i][j].setIndex(0);
+                    buildings.get(0).getIndexes().add(new Point(i, j));
                     tiles[i][j] = new Tile(ResourceLoader.loadImage("res/road.png"));
                 } else {
                     modelTiles[i][j] = new ModelTile("grass");
@@ -114,6 +117,7 @@ public class GameEngine {
                 }
                 full = false;
                 ind = i;
+                break;
             }
         }
         if (full) {
@@ -151,42 +155,30 @@ public class GameEngine {
     }
 
     /**
-     * Dont mind the road part, it will get patched later on!!! Works with a
-     * building's indexes. Changes the pictures in the tiles matrix to grass and
-     * repaints. Changes the types and indexes back to grass and -1 in the
-     * modelTiles matrix. Sets the given index in the buildings arrayList to
-     * null.
+     * Works with a building's indexes. Changes the pictures in the tiles matrix
+     * to grass and repaints. Changes the types and indexes back to grass and -1
+     * in the modelTiles matrix. Sets the given index in the buildings arrayList
+     * to null.
      *
      * @param iSubstitute, i index of matrixes
      * @param jSubstitute, j index of matrixes
      */
     private void removeBuilding(int iSubstitute, int jSubstitute) {
-        if ("road".equals(modelTiles[iSubstitute][jSubstitute].getType())) {
+        /*for (Point i : buildings.get(modelTiles[iSubstitute][jSubstitute].getIndex()).getIndexes()) {
+                        System.out.println(i.toString() + "\n");
+                    }*/
+        int tempIndex = modelTiles[iSubstitute][jSubstitute].getIndex();
+        for (Point i : buildings.get(modelTiles[iSubstitute][jSubstitute].getIndex()).getIndexes()) {
             try {
-                tiles[iSubstitute][jSubstitute].setImage(ResourceLoader.loadImage("res/grass.png"));
+                tiles[(int) i.getX()][(int) i.getY()].setImage(ResourceLoader.loadImage("res/grass.png"));
             } catch (IOException ex) {
                 Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
             }
-            tiles[iSubstitute][jSubstitute].repaint();
-            modelTiles[iSubstitute][jSubstitute].setType("grass");
-        } else {
-            /*for (Point i : buildings.get(modelTiles[iSubstitute][jSubstitute].getIndex()).getIndexes()) {
-                        System.out.println(i.toString() + "\n");
-                    }*/
-            //A ROADON VALTOZTATNI KELL ?AZ IS "EPITMENY", EZT MAJD KESOBB PATCHALEM
-            int tempIndex = modelTiles[iSubstitute][jSubstitute].getIndex();
-            for (Point i : buildings.get(modelTiles[iSubstitute][jSubstitute].getIndex()).getIndexes()) {
-                try {
-                    tiles[(int) i.getX()][(int) i.getY()].setImage(ResourceLoader.loadImage("res/grass.png"));
-                } catch (IOException ex) {
-                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                tiles[(int) i.getX()][(int) i.getY()].repaint();
-                modelTiles[(int) i.getX()][(int) i.getY()].setType("grass");
-                modelTiles[(int) i.getX()][(int) i.getY()].setIndex(-1);
-            }
-            buildings.set(tempIndex, null);
+            tiles[(int) i.getX()][(int) i.getY()].repaint();
+            modelTiles[(int) i.getX()][(int) i.getY()].setType("grass");
+            modelTiles[(int) i.getX()][(int) i.getY()].setIndex(-1);
         }
+        buildings.set(tempIndex, null);
     }
 
     public int getMoney() {
@@ -248,15 +240,26 @@ public class GameEngine {
 
         /**
          * Handles the validation of building placement. Handles the validation
-         * of a building destruction.
+         * of a building destruction. Forbids the destruction of the spawning
+         * road.
          *
          * @param e
          */
         @Override
         public void mouseClicked(MouseEvent e) {
+            /*for(Building i : buildings){
+                if(i!=null){
+                    System.out.println(i.getName()+"\n");
+                }else{
+                    System.out.println("NULL\n");
+                }
+            }
+            System.out.println("----------");*/
             //System.out.println(modelTiles[iSubstitute][jSubstitute].getIndex() + " " + modelTiles[iSubstitute][jSubstitute].getType());
             if (destroy && !"grass".equals(modelTiles[iSubstitute][jSubstitute].getType())) {
-                removeBuilding(iSubstitute, jSubstitute);
+                if (iSubstitute != 22 || jSubstitute != 12) {
+                    removeBuilding(iSubstitute, jSubstitute);
+                }
             } else if (building != null) {
 
                 if (money - building.getBUILDING_COST() >= 0) {
