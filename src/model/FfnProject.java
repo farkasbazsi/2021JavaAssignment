@@ -30,6 +30,7 @@ public class FfnProject extends JFrame {
 
     private ArrayList<String> freeGames = new ArrayList<>();
     private Timer playTimer;
+    private Payment payment;
 
     private GameEngine engine;
 
@@ -43,6 +44,7 @@ public class FfnProject extends JFrame {
         centerPanel = new JPanel();
         //engine = new GameEngine(centerPanel);
 
+        payment = new Payment();
         read_buildings();
 
         westPanel = new JPanel();
@@ -173,25 +175,60 @@ public class FfnProject extends JFrame {
         entranceFeebutton.setPreferredSize(new Dimension(120, 40));
         buttonPanel.add(entranceFeebutton);
 
+        entranceFeebutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                payment.setEntranceFee(100);
+            }
+        });
+
         JButton workerFeebutton = new JButton();
         workerFeebutton.setText("Dolgozói bérek");
         workerFeebutton.setPreferredSize(new Dimension(120, 40));
         buttonPanel.add(workerFeebutton);
 
+        workerFeebutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                payment.setWorkerFee(30);
+            }
+        });
+
         JButton gamesFeebutton = new JButton();
-        gamesFeebutton.setText("Játékok árai");
+        gamesFeebutton.setText("Játékok ára");
         gamesFeebutton.setPreferredSize(new Dimension(120, 40));
         buttonPanel.add(gamesFeebutton);
 
+        gamesFeebutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                payment.setGamesFee(60);
+            }
+        });
+
         JButton restaurantFeebutton = new JButton();
-        restaurantFeebutton.setText("Éttermek árai");
+        restaurantFeebutton.setText("Éttermek ára");
         restaurantFeebutton.setPreferredSize(new Dimension(120, 40));
         buttonPanel.add(restaurantFeebutton);
+
+        restaurantFeebutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                payment.setRestaurantFee(50);
+            }
+        });
 
         JButton toiletFeebutton = new JButton();
         toiletFeebutton.setText("Mosdó ára");
         toiletFeebutton.setPreferredSize(new Dimension(120, 40));
         buttonPanel.add(toiletFeebutton);
+
+        toiletFeebutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                payment.setToiletFee(10);
+            }
+        });
 
         for (int i = 0; i < 9; i++) {
             JCheckBox cb = new JCheckBox(buildingList.get(i).getName());
