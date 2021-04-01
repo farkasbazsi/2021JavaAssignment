@@ -275,7 +275,8 @@ public class GameEngine {
                                 }
                             }
                         }
-                        if (free) {
+
+                        if (free && nearRoad(iSubstitute, jSubstitute)) {
                             createBuilding(iSubstitute, jSubstitute);
                             money -= building.getBUILDING_COST();
                         }
@@ -293,6 +294,42 @@ public class GameEngine {
         public void mouseExited(MouseEvent e) {
             tiles[iSubstitute][jSubstitute].setBorder(BorderFactory.createEmptyBorder());
         }
+    }
+
+    /**
+     * Validates if there is a road next to the tiles where we want to build.
+     * True, if there is a road, false if there isnt.
+     *
+     * @param iSubstitute, i index of matrixes;
+     * @param jSubstitute, j index of matrixes;
+     * @return
+     */
+    public boolean nearRoad(int iSubstitute, int jSubstitute) {
+        for (int k = 0; k <= building.getDetails().height - 1; k++) {
+            for (int l = 0; l <= building.getDetails().length - 1; l++) {
+                if (k == 0 && iSubstitute != 0) {
+                    if ("road".equals(modelTiles[iSubstitute + k - 1][jSubstitute + l].getType())) {
+                        return true;
+                    }
+                }
+                if (k == building.getDetails().height - 1 && iSubstitute + k + 1 <= height - 1) {
+                    if ("road".equals(modelTiles[iSubstitute + k + 1][jSubstitute + l].getType())) {
+                        return true;
+                    }
+                }
+                if (l == 0 && jSubstitute != 0) {
+                    if ("road".equals(modelTiles[iSubstitute + k][jSubstitute + l - 1].getType())) {
+                        return true;
+                    }
+                }
+                if (l == building.getDetails().length - 1 && jSubstitute + l + 1 <= width - 1) {
+                    if ("road".equals(modelTiles[iSubstitute + k][jSubstitute + l + 1].getType())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     public void setBuilding(Building building) {
