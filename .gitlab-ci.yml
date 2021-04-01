@@ -1,0 +1,20 @@
+image: java:latest
+
+stages:
+    - build
+    - test
+
+build:
+    stage: build
+    script:
+        - ant compile
+        - ant jar
+    artifacts:
+        path:
+            - build/
+
+test:
+    stage: test
+    script:
+        - ant test
+
