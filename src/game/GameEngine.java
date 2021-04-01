@@ -2,6 +2,7 @@ package game;
 
 import java.awt.Color;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -92,8 +93,8 @@ public class GameEngine {
      * building itself). Changes the pictures of the correct tiles in the Tiles
      * matrix & repaints them.
      *
-     * @param iSubstitute, i index of matrixes
-     * @param jSubstitute, j index of matrixes
+     * @param iSubstitute, i index of matrixes.
+     * @param jSubstitute, j index of matrixes.
      */
     private void createBuilding(int iSubstitute, int jSubstitute) {
         boolean full = true;
@@ -160,8 +161,8 @@ public class GameEngine {
      * in the modelTiles matrix. Sets the given index in the buildings arrayList
      * to null.
      *
-     * @param iSubstitute, i index of matrixes
-     * @param jSubstitute, j index of matrixes
+     * @param iSubstitute, i index of matrixes.
+     * @param jSubstitute, j index of matrixes.
      */
     private void removeBuilding(int iSubstitute, int jSubstitute) {
         /*for (Point i : buildings.get(modelTiles[iSubstitute][jSubstitute].getIndex()).getIndexes()) {
@@ -287,12 +288,50 @@ public class GameEngine {
 
         @Override
         public void mouseEntered(MouseEvent e) {
-            tiles[iSubstitute][jSubstitute].setBorder(BorderFactory.createLineBorder(Color.black));
+            if (building != null) {
+                try {
+                    visualizePlacing(iSubstitute, jSubstitute, ResourceLoader.loadImage("res/placeHolder.png"));
+                } catch (IOException ex) {
+                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                tiles[iSubstitute][jSubstitute].setBorder(BorderFactory.createLineBorder(Color.black));
+            }
         }
 
         @Override
         public void mouseExited(MouseEvent e) {
-            tiles[iSubstitute][jSubstitute].setBorder(BorderFactory.createEmptyBorder());
+            if (building != null) {
+                try {
+                    visualizePlacing(iSubstitute, jSubstitute, ResourceLoader.loadImage("res/grass.png"));
+                } catch (IOException ex) {
+                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                tiles[iSubstitute][jSubstitute].setBorder(BorderFactory.createEmptyBorder());
+            }
+        }
+    }
+
+    /**
+     * Paints tiles accordingly to the mouseevent and the size of the building
+     * that we want to place down.
+     *
+     * @param iSubstitute, i index of matrixes.
+     * @param jSubstitute, j index of matrixes.
+     * @param image, grass.png or placeHolder.png, depending on the mouseevent.
+     */
+    public void visualizePlacing(int iSubstitute, int jSubstitute, Image image) {
+        for (int k = 0; k <= building.getDetails().height - 1; k++) {
+            for (int l = 0; l <= building.getDetails().length - 1; l++) {
+                //if (iSubstitute + k < height + 1 && jSubstitute + l < width + 1) {
+                if (iSubstitute + k < height && jSubstitute + l < width) {
+                    if ("grass".equals(modelTiles[iSubstitute + k][jSubstitute + l].getType())) {
+                        tiles[iSubstitute + k][jSubstitute + l].setImage(image);
+                        tiles[iSubstitute + k][jSubstitute + l].repaint();
+                    }
+                }
+            }
         }
     }
 
@@ -300,8 +339,8 @@ public class GameEngine {
      * Validates if there is a road next to the tiles where we want to build.
      * True, if there is a road, false if there isnt.
      *
-     * @param iSubstitute, i index of matrixes;
-     * @param jSubstitute, j index of matrixes;
+     * @param iSubstitute, i index of matrixes.
+     * @param jSubstitute, j index of matrixes.
      * @return
      */
     public boolean nearRoad(int iSubstitute, int jSubstitute) {
