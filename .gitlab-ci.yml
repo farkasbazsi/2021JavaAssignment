@@ -9,9 +9,6 @@ build:
     script:
         - ant compile
         - ant jar
-    artifacts:
-        path:
-            - build/
 
 test:
     stage: test
