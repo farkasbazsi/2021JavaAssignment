@@ -269,7 +269,7 @@ public class FfnProject extends JFrame {
     private void fillWestPanel() throws IOException {
         JPanel buildingPanel = new JPanel();
         JPanel insertPanel = new JPanel();
-        final int row = 10;
+        final int row = 8;
         final int column = 2;
 
         westPanel.setLayout(new BoxLayout(westPanel, BoxLayout.Y_AXIS));
@@ -374,6 +374,7 @@ public class FfnProject extends JFrame {
         buttons.add(Bbutton);
 
         Bbutton.setContentAreaFilled(false);
+        Bbutton.setToolTipText("Épület lebontása. Építési költség fele visszatérítésre kerül.");
 
         buildingPanel.add(BorderLayout.CENTER, new JScrollPane(insertPanel));
 

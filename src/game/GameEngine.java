@@ -72,7 +72,7 @@ public class GameEngine {
                     modelTiles[i][j] = new ModelTile("road");
                     modelTiles[i][j].setIndex(0);
                     buildings.get(0).getIndexes().add(new Point(i, j));
-                    tiles[i][j] = new Tile(ResourceLoader.loadImage("res/road.png"));
+                    tiles[i][j] = new Tile(ResourceLoader.loadImage("res/entrance.png"));
                 } else {
                     modelTiles[i][j] = new ModelTile("grass");
                     tiles[i][j] = new Tile(ResourceLoader.loadImage("res/grass.png"));
@@ -179,6 +179,8 @@ public class GameEngine {
             modelTiles[(int) i.getX()][(int) i.getY()].setType("grass");
             modelTiles[(int) i.getX()][(int) i.getY()].setIndex(-1);
         }
+        int refound = (int)(buildings.get(tempIndex).getBUILDING_COST())/2;
+        money += refound;
         buildings.set(tempIndex, null);
     }
 
@@ -256,7 +258,7 @@ public class GameEngine {
                 }
             }
             System.out.println("----------");*/
-            System.out.println(modelTiles[iSubstitute][jSubstitute].getIndex() + " " + modelTiles[iSubstitute][jSubstitute].getType());
+            //System.out.println(modelTiles[iSubstitute][jSubstitute].getIndex() + " " + modelTiles[iSubstitute][jSubstitute].getType());
             if (destroy && !"grass".equals(modelTiles[iSubstitute][jSubstitute].getType())) {
                 if (iSubstitute != 22 || jSubstitute != 12) {
                     removeBuilding(iSubstitute, jSubstitute);
