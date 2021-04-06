@@ -105,6 +105,12 @@ public class FfnProject extends JFrame {
         }
     }
 
+    /**
+     * Gets the attributes of the buildings from the buildings.txt.
+     * Insert them to the buildings arraylist.
+     *
+     * @param
+     */
     private void read_buildings() {
         try {
             File myObj = new File("src/game/buildings.txt");
@@ -152,6 +158,13 @@ public class FfnProject extends JFrame {
         }
     }
 
+    /**
+     * Fill the right sided pane with content.
+     * In this pane the player can change the different fees,
+     * set which games to be free to use,
+     * and open the park.
+     *
+     */
     private void fillEastPanel() {
         JPanel buttonPanel = new JPanel();
         buttonPanel.setBackground(Color.LIGHT_GRAY);
@@ -266,6 +279,13 @@ public class FfnProject extends JFrame {
                 + "%        Park összértéke: " + engine.getParkValue() + "Ft");
     }
 
+    /**
+     * Fill the left sided pane with content.
+     * From this pane the player can insert buildings into the park,
+     * and destroy them by the bulldozer icon.
+     *
+     * @throws IOException , if the ResourceLoader can't find the pictures
+     */
     private void fillWestPanel() throws IOException {
         JPanel buildingPanel = new JPanel();
         JPanel insertPanel = new JPanel();

@@ -22,6 +22,13 @@ public class Payment {
         this.entranceFee = 50;
     }
 
+    /**
+     * When the player wants to change the fees these functions are called.
+     * The setFee functions are almost the same, the difference is the given
+     * fee and the text.
+     * 
+     * @param scale the maximum value which the given fee can be
+     */
     public void setEntranceFee(int scale) {
         JFrame parent = new JFrame();
 
@@ -87,6 +94,12 @@ public class Payment {
         toiletFee = slider.getValue();
     }
 
+    /**
+     * Creates slider for the given optionPane.
+     *
+     * @param optionPane panel where the slider is shown
+     * @param scale the maximum amount of the slider
+     */
     static JSlider getSlider(final JOptionPane optionPane, int scale) {
         JSlider slider = new JSlider(0, scale);
         slider.setMajorTickSpacing(10);
