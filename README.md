@@ -1,5 +1,2 @@
 # FFN project
 
-## Alma
-
-## Körte
