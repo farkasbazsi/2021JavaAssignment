@@ -1,7 +1,5 @@
 package model;
 
-import java.awt.Image;
-
 public class Details {
 
     public String image;

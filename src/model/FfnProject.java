@@ -32,6 +32,8 @@ public class FfnProject extends JFrame {
 
     private ArrayList<String> freeGames = new ArrayList<>();
     private Timer playTimer;
+    private Timer gameTime;
+    private int currentTime = 0;
     private Payment payment;
 
     private GameEngine engine;
@@ -90,11 +92,26 @@ public class FfnProject extends JFrame {
 
         playTimer = new Timer(100, new playTimerListener());
         playTimer.start();
+        
+        //Test phase
+        //BEGIN
+        Visitor visitor = new Visitor();
+        gameTime = new Timer(1000,new gameTimerListener());
+        gameTime.start();
+        //END
+        
         setSize(1080, 1920); //1200,850
         setResizable(false);
         pack();
         setLocationRelativeTo(null);
         setVisible(true);
+    }
+
+    private class gameTimerListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            currentTime++;
+        }
     }
 
     class playTimerListener implements ActionListener {
@@ -103,6 +120,7 @@ public class FfnProject extends JFrame {
         public void actionPerformed(ActionEvent ae) {
             updateSouthLabelText();
         }
+
     }
 
     /**
@@ -276,7 +294,7 @@ public class FfnProject extends JFrame {
     private void updateSouthLabelText() {
         southLabel.setText("Egyenleg: " + engine.getMoney() + "Ft       Látogatók száma: "
                 + engine.getVisitorsCount() + " fő       Boldogság szintje: " + engine.getAvgHappiness()
-                + "%        Park összértéke: " + engine.getParkValue() + "Ft");
+                + "%        Park összértéke: " + engine.getParkValue() + "Ft       Indítás óta eltelt idő: "+ currentTime+" mp");
     }
 
     /**
@@ -417,6 +435,7 @@ public class FfnProject extends JFrame {
             System.exit(0);
         }
     }
+    
 
     public static void main(String[] args) throws IOException {
         FfnProject project = new FfnProject();
