@@ -4,6 +4,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.Timer;
 
+/**
+ * spawnTile-ról indulunk.
+ * boldogság maximumon, éhség 0.
+ * JPanel.add(visitor)
+ * - mozgás másodpercenként
+ * - cél kiválasztása (building listából random 1 játék aminek a statusza active)
+ * - másodpercenként menjen a cél felé
+ * @author Hexa
+ */
+
 public class Visitor {
     private Details details;
     private int happiness;
@@ -47,7 +57,7 @@ public class Visitor {
     private class visitorTimer implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            System.out.println(time++);
+            //mozogj
         }
     }
     

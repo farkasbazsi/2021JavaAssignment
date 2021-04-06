@@ -294,7 +294,9 @@ public class FfnProject extends JFrame {
     private void updateSouthLabelText() {
         southLabel.setText("Egyenleg: " + engine.getMoney() + "Ft       Látogatók száma: "
                 + engine.getVisitorsCount() + " fő       Boldogság szintje: " + engine.getAvgHappiness()
-                + "%        Park összértéke: " + engine.getParkValue() + "Ft       Indítás óta eltelt idő: "+ currentTime+" mp");
+                + "%        Park összértéke: " + engine.getParkValue() + "Ft       "
+                + "Indítás óta eltelt idő: "+ (currentTime < 60 ? currentTime + " mp" : currentTime < 3600 ? currentTime / 60 + " perc " + currentTime % 60 + " másodperc" : 
+                currentTime / 3600 + " óra " + currentTime % 3600 + " perc"));
     }
 
     /**
