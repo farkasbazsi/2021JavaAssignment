@@ -29,7 +29,7 @@ test_model:
 deploy_game:
     stage: deploy
     script:
-        - ant build
+        - ant deploy
     artifacts:
         paths:
             - dist/*.jar
