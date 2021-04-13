@@ -95,7 +95,6 @@ public class FfnProject extends JFrame {
         
         //Test phase
         //BEGIN
-        Visitor visitor = new Visitor();
         gameTime = new Timer(1000,new gameTimerListener());
         gameTime.start();
         //END

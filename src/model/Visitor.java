@@ -2,6 +2,7 @@ package model;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.swing.JPanel;
 import javax.swing.Timer;
 
 /**
@@ -14,7 +15,7 @@ import javax.swing.Timer;
  * @author Hexa
  */
 
-public class Visitor {
+public class Visitor extends JPanel{
     private Details details;
     private int happiness;
     private int hunger;

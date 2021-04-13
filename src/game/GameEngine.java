@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
@@ -43,6 +45,7 @@ public class GameEngine {
     private final int width = 25;
     private Building building;
     private boolean destroy;
+    private Visitor visitor;
 
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
@@ -83,7 +86,16 @@ public class GameEngine {
                 panel.add(tiles[i][j]);
             }
         }
+        // DEBUG
+        // BEGIN
+        visitor = new Visitor();
+        visitor.setBackground(Color.red);
+        tiles[22][12].add(visitor);
+        Timer t = new Timer(1000,new visitorTimer());
+        t.start();
+        // END
     }
+    
 
     /**
      * Gets called, if the placement is correct (no overlapping, no
@@ -228,6 +240,22 @@ public class GameEngine {
 
     private void removeWorker(int id) {
 
+    }
+
+    private class visitorTimer implements ActionListener {
+        int i, j;
+        public visitorTimer(){
+            i = 22;
+            j=12;
+        }
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            tiles[i][j].remove(visitor);
+            tiles[i][j].repaint();
+            if(i > 0 && modelTiles[i-1][j].getType().equals("road")) i--;
+            tiles[i][j].add(visitor);
+            tiles[i][j].repaint();
+        }
     }
 
     /**
