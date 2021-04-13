@@ -32,5 +32,5 @@ deploy_game:
         - ant build
     artifacts:
         paths:
-            - build/libs/*.jar
+            - dist/*.jar
         
