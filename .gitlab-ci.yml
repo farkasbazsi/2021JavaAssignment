@@ -3,6 +3,7 @@ image: ubuntu:20.10
 stages:
   - build
   - test
+  - deploy
 
 before_script:
   - apt-get update -yqq
@@ -23,3 +24,13 @@ test_model:
       ant test
       -Dlibs.junit_4.classpath=/usr/share/java/junit4.jar
       -Dlibs.hamcrest.classpath=/usr/share/java/hamcrest-core.jar
+      
+ # Deploy
+deploy_game:
+    stage: deploy
+    script:
+        - ant build
+    artifacts:
+        paths:
+            - build/libs/*.jar
+        
