@@ -10,6 +10,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -47,6 +49,14 @@ public class GameEngine {
     private boolean destroy;
     private Visitor visitor;
 
+    private Hashtable<Integer, ArrayList<Integer>> hm = new Hashtable<>();
+    private int v = 1;
+    ArrayList<ArrayList<Integer>> adj
+            = new ArrayList<ArrayList<Integer>>();
+    int parentRoadKey = 0;
+    int parentRoadI = 0;
+    int parentRoadJ = 0;
+
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
         this.money = 10000;
@@ -77,6 +87,12 @@ public class GameEngine {
                     modelTiles[i][j].setIndex(0);
                     buildings.get(0).getIndexes().add(new Point(i, j));
                     tiles[i][j] = new Tile(ResourceLoader.loadImage("res/entrance.png"));
+
+                    ArrayList<Integer> newNode = new ArrayList<>();
+                    newNode.add(i);
+                    newNode.add(j);
+                    hm.put(0, newNode);
+
                 } else {
                     modelTiles[i][j] = new ModelTile("grass");
                     tiles[i][j] = new Tile(ResourceLoader.loadImage("res/grass.png"));
@@ -89,7 +105,7 @@ public class GameEngine {
         // DEBUG
         // BEGIN
         visitor = new Visitor();
-        visitor.setBackground(Color.red);
+        visitor.setBackground(Color.blue);
         tiles[22][12].add(visitor);
         Timer t = new Timer(1000, new visitorTimer());
         t.start();
@@ -144,6 +160,79 @@ public class GameEngine {
                 buildings.add(new TrashBin((TrashBin) building));
             } else if (building instanceof Road) {
                 buildings.add(new Road((Road) building));
+
+                ArrayList<Integer> newNode = new ArrayList<>();
+                newNode.add(iSubstitute);
+                newNode.add(jSubstitute);
+                hm.put(v, newNode);
+
+                if (v == 1) {
+                    adj.add(new ArrayList<Integer>());
+                    adj.add(new ArrayList<Integer>());
+                    addEdge(adj, 0, v);
+                } else {
+                    adj.add(new ArrayList<Integer>());
+                    if (iSubstitute + 1 <= 22 && iSubstitute - 1 >= 0) {
+                        if ("road".equals(modelTiles[iSubstitute + 1][jSubstitute].getType())) {
+                            parentRoadI = iSubstitute + 1;
+                            parentRoadJ = jSubstitute;
+
+                            hm.forEach((k, Pvalue) -> {
+                                if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
+                                    parentRoadKey = k;
+                                }
+                            });
+
+                            addEdge(adj, parentRoadKey, v);
+                        }
+
+                        if ("road".equals(modelTiles[iSubstitute - 1][jSubstitute].getType())) {
+                            parentRoadI = iSubstitute - 1;
+                            parentRoadJ = jSubstitute;
+
+                            hm.forEach((k, Pvalue) -> {
+                                if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
+                                    parentRoadKey = k;
+                                }
+                            });
+
+                            addEdge(adj, parentRoadKey, v);
+                        }
+                    }
+
+                    if (jSubstitute + 1 <= 24 && jSubstitute - 1 >= 0) {
+                        if ("road".equals(modelTiles[iSubstitute][jSubstitute + 1].getType())) {
+                            parentRoadI = iSubstitute;
+                            parentRoadJ = jSubstitute + 1;
+
+                            hm.forEach((k, Pvalue) -> {
+                                if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
+                                    parentRoadKey = k;
+                                }
+                            });
+
+                            addEdge(adj, parentRoadKey, v);
+                        }
+                        if ("road".equals(modelTiles[iSubstitute][jSubstitute - 1].getType())) {
+                            parentRoadI = iSubstitute;
+                            parentRoadJ = jSubstitute - 1;
+
+                            hm.forEach((k, Pvalue) -> {
+                                if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
+                                    parentRoadKey = k;
+                                }
+                            });
+
+                            addEdge(adj, parentRoadKey, v);
+                        }
+                    }
+
+                    parentRoadI = 0;
+                    parentRoadJ = 0;
+                    parentRoadKey = 0;
+                }
+                v++;
+
             } else if (building instanceof Plant) {
                 buildings.add(new Plant((Plant) building));
             } else {
@@ -267,6 +356,8 @@ public class GameEngine {
     private class visitorTimer implements ActionListener {
 
         int i, j;
+        int source;
+        int dest;
 
         public visitorTimer() {
             i = 22;
@@ -282,11 +373,29 @@ public class GameEngine {
             tiles[i][j].remove(visitor);
             tiles[i][j].repaint();
             int[] buildingCoordinates = findBuilding(modelTiles, "roller_coaster");
+            //System.out.println(buildingCoordinates[0] + " " + buildingCoordinates[1]);
+            //System.out.println(adj);
+            //System.out.println(hm);
+
+            hm.forEach((k, Pvalue) -> {
+                if (Pvalue.get(0).equals(i) && Pvalue.get(1).equals(j)) {
+                    source = k;
+                }
+            });
             
+            hm.forEach((k, Pvalue) -> {
+                if (Pvalue.get(0).equals(buildingCoordinates[0]-1) && Pvalue.get(1).equals(buildingCoordinates[1]-2)) {
+                    dest = k;
+                }
+            });
+            if(buildingCoordinates[0] != 0) {
+                //System.out.println(source);
+                //System.out.println(dest);
+                printShortestDistance(adj, source, dest, v);
+            }
             /**
              * IDE KELL A PATH FINDING
              */
-            
             /*if(buildingCoordinates[0] != 0 && buildingCoordinates[0] != 0)
             if (i > buildingCoordinates[0] && modelTiles[i - 1][j].getType().equals("road")) {
                 i--;
@@ -297,7 +406,7 @@ public class GameEngine {
                 j--;
             } else if (j < buildingCoordinates[1] && modelTiles[i][j + 1].getType().equals("road")) {
                 j++;
-            }*/
+            }*/ 
             tiles[i][j].add(visitor);
             tiles[i][j].repaint();
         }
@@ -461,5 +570,100 @@ public class GameEngine {
 
     public boolean isDestroy() {
         return destroy;
+    }
+
+    // function to form edge between two vertices
+    // source and dest
+    private static void addEdge(ArrayList<ArrayList<Integer>> adj, int i, int j) {
+        adj.get(i).add(j);
+        adj.get(j).add(i);
+    }
+
+    // function to print the shortest distance and path
+    // between source vertex and destination vertex
+    private static void printShortestDistance(
+            ArrayList<ArrayList<Integer>> adj,
+            int s, int dest, int v) {
+        // predecessor[i] array stores predecessor of
+        // i and distance array stores distance of i
+        // from s
+        int pred[] = new int[v];
+        int dist[] = new int[v];
+
+        if (BFS(adj, s, dest, v, pred, dist) == false) {
+            System.out.println("Given source and destination"
+                    + "are not connected");
+            return;
+        }
+
+        // LinkedList to store path
+        LinkedList<Integer> path = new LinkedList<Integer>();
+        int crawl = dest;
+        path.add(crawl);
+        while (pred[crawl] != -1) {
+            path.add(pred[crawl]);
+            crawl = pred[crawl];
+        }
+
+        // Print distance
+        System.out.println("Shortest path length is: " + dist[dest]);
+
+        // Print path
+        System.out.println("Path is ::");
+        for (int i = path.size() - 1; i >= 0; i--) {
+            System.out.print(path.get(i) + " ");
+        }
+    }
+
+    // a modified version of BFS that stores predecessor
+    // of each vertex in array pred
+    // and its distance from source in array dist
+    private static boolean BFS(ArrayList<ArrayList<Integer>> adj, int src,
+            int dest, int v, int pred[], int dist[]) {
+        // a queue to maintain queue of vertices whose
+        // adjacency list is to be scanned as per normal
+        // BFS algorithm using LinkedList of Integer type
+        LinkedList<Integer> queue = new LinkedList<Integer>();
+
+        // boolean array visited[] which stores the
+        // information whether ith vertex is reached
+        // at least once in the Breadth first search
+        boolean visited[] = new boolean[v];
+
+        // initially all vertices are unvisited
+        // so v[i] for all i is false
+        // and as no path is yet constructed
+        // dist[i] for all i set to infinity
+        for (int i = 0; i < v; i++) {
+            visited[i] = false;
+            dist[i] = Integer.MAX_VALUE;
+            pred[i] = -1;
+        }
+
+        // now source is first to be visited and
+        // distance from source to itself should be 0
+        visited[src] = true;
+        dist[src] = 0;
+        queue.add(src);
+
+        // bfs Algorithm
+        while (!queue.isEmpty()) {
+            int u = queue.remove();
+            for (int i = 0; i < adj.get(u).size(); i++) {
+                if (visited[adj.get(u).get(i)] == false) {
+                    visited[adj.get(u).get(i)] = true;
+                    dist[adj.get(u).get(i)] = dist[u] + 1;
+                    pred[adj.get(u).get(i)] = u;
+                    queue.add(adj.get(u).get(i));
+
+                    // stopping condition (when we find
+                    // our destination)
+                    if (adj.get(u).get(i) == dest) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

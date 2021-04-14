@@ -39,7 +39,7 @@ public class FfnProject extends JFrame {
     private GameEngine engine;
 
     public FfnProject() throws IOException {
-        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        setDefaultCloseOperation(EXIT_ON_CLOSE);
         setTitle("TAPS - Total Accurate Park Simulator");
 
         southPanel = new JPanel();
@@ -82,7 +82,7 @@ public class FfnProject extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent event) {
-                exitConfirmation();
+                //exitConfirmation();
             }
         });
 
