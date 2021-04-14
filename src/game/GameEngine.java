@@ -282,7 +282,12 @@ public class GameEngine {
             tiles[i][j].remove(visitor);
             tiles[i][j].repaint();
             int[] buildingCoordinates = findBuilding(modelTiles, "roller_coaster");
-            if(buildingCoordinates[0] != 0 && buildingCoordinates[0] != 0)
+            
+            /**
+             * IDE KELL A PATH FINDING
+             */
+            
+            /*if(buildingCoordinates[0] != 0 && buildingCoordinates[0] != 0)
             if (i > buildingCoordinates[0] && modelTiles[i - 1][j].getType().equals("road")) {
                 i--;
             } else if (i < buildingCoordinates[0] && modelTiles[i + 1][j].getType().equals("road")) {
@@ -292,7 +297,7 @@ public class GameEngine {
                 j--;
             } else if (j < buildingCoordinates[1] && modelTiles[i][j + 1].getType().equals("road")) {
                 j++;
-            }
+            }*/
             tiles[i][j].add(visitor);
             tiles[i][j].repaint();
         }
