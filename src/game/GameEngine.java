@@ -91,11 +91,10 @@ public class GameEngine {
         visitor = new Visitor();
         visitor.setBackground(Color.red);
         tiles[22][12].add(visitor);
-        Timer t = new Timer(1000,new visitorTimer());
+        Timer t = new Timer(1000, new visitorTimer());
         t.start();
         // END
     }
-    
 
     /**
      * Gets called, if the placement is correct (no overlapping, no
@@ -192,7 +191,7 @@ public class GameEngine {
             modelTiles[(int) i.getX()][(int) i.getY()].setType("grass");
             modelTiles[(int) i.getX()][(int) i.getY()].setIndex(-1);
         }
-        int refound = (int)(buildings.get(tempIndex).getBUILDING_COST())/2;
+        int refound = (int) (buildings.get(tempIndex).getBUILDING_COST()) / 2;
         money += refound;
         buildings.set(tempIndex, null);
     }
@@ -242,17 +241,58 @@ public class GameEngine {
 
     }
 
-    private class visitorTimer implements ActionListener {
-        int i, j;
-        public visitorTimer(){
-            i = 22;
-            j=12;
+    public void printModel(ModelTile[][] tiles) {
+        for (ModelTile[] tile : tiles) {
+            for (ModelTile modelTile : tile) {
+                if (!modelTile.getType().equals("grass")) {
+                    System.out.println(modelTile.getType());
+                }
+            }
         }
+    }
+
+    public int[] findBuilding(ModelTile[][] tiles, String name) {
+        int arr[] = new int[2];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) {
+                if (tiles[i][j].getType().equals(name)) {
+                    arr[0] = i;
+                    arr[1] = j;
+                }
+            }
+        }
+        return arr;
+    }
+
+    private class visitorTimer implements ActionListener {
+
+        int i, j;
+
+        public visitorTimer() {
+            i = 22;
+            j = 12;
+        }
+
         @Override
         public void actionPerformed(ActionEvent arg0) {
+            //i -> fel-le
+            //j -> jobbra-balra
+            // meg kell nézni hol van a legközelebbi ilyen indexű épület
+            // oda elmenni
             tiles[i][j].remove(visitor);
             tiles[i][j].repaint();
-            if(i > 0 && modelTiles[i-1][j].getType().equals("road")) i--;
+            int[] buildingCoordinates = findBuilding(modelTiles, "roller_coaster");
+            if(buildingCoordinates[0] != 0 && buildingCoordinates[0] != 0)
+            if (i > buildingCoordinates[0] && modelTiles[i - 1][j].getType().equals("road")) {
+                i--;
+            } else if (i < buildingCoordinates[0] && modelTiles[i + 1][j].getType().equals("road")) {
+                i++;
+            }
+            else if (j > buildingCoordinates[1] && modelTiles[i][j - 1].getType().equals("road")) {
+                j--;
+            } else if (j < buildingCoordinates[1] && modelTiles[i][j + 1].getType().equals("road")) {
+                j++;
+            }
             tiles[i][j].add(visitor);
             tiles[i][j].repaint();
         }
