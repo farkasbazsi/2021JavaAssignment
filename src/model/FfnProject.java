@@ -283,6 +283,14 @@ public class FfnProject extends JFrame {
         openbutton.setText("Park megnyitása");
         openbutton.setPreferredSize(new Dimension(100, 40));
         openbutton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        
+        openbutton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                engine.openPark();
+                openbutton.setEnabled(false);
+            }
+        });
 
         eastPanel.add(eastLabel);
         eastPanel.add(buttonPanel);

@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -51,11 +52,21 @@ public class GameEngine {
 
     private Hashtable<Integer, ArrayList<Integer>> hm = new Hashtable<>();
     private int v = 1;
-    ArrayList<ArrayList<Integer>> adj
+    ArrayList<ArrayList<Integer>> graph
             = new ArrayList<ArrayList<Integer>>();
     int parentRoadKey = 0;
     int parentRoadI = 0;
     int parentRoadJ = 0;
+    LinkedList<Integer> path = new LinkedList<Integer>();
+    boolean arrived = true;
+    private boolean isOpen = false;
+    int posVis = 0;
+    int pathIndex = 0;
+    int hmDeleteIndex;
+    Timer t = new Timer(1000, new visitorTimer());
+    private Building randBuilding;
+    private boolean edge = false;
+    private int[] prevBuild = new int[2];
 
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
@@ -104,12 +115,17 @@ public class GameEngine {
         }
         // DEBUG
         // BEGIN
+
+        // END
+    }
+
+    public void openPark() {
+        isOpen = true;
         visitor = new Visitor();
         visitor.setBackground(Color.blue);
         tiles[22][12].add(visitor);
-        Timer t = new Timer(1000, new visitorTimer());
         t.start();
-        // END
+        getRandomElement();
     }
 
     /**
@@ -152,86 +168,43 @@ public class GameEngine {
         if (full) {
             if (building instanceof Ride) {
                 buildings.add(new Ride((Ride) building));
+
+                if (building.getDetails().height == 2) {
+                    insertRoadToGraph(iSubstitute + 1, jSubstitute);
+                }
+                if (building.getDetails().length == 2) {
+                    insertRoadToGraph(iSubstitute, jSubstitute + 1);
+                }
+                if (building.getDetails().length == 2 && building.getDetails().height == 2) {
+                    insertRoadToGraph(iSubstitute + 1, jSubstitute + 1);
+                }
+                insertRoadToGraph(iSubstitute, jSubstitute);
+
             } else if (building instanceof Restaurant) {
                 buildings.add(new Restaurant((Restaurant) building));
+
+                if (building.getDetails().height == 2) {
+                    insertRoadToGraph(iSubstitute + 1, jSubstitute);
+                }
+                if (building.getDetails().length == 2) {
+                    insertRoadToGraph(iSubstitute, jSubstitute + 1);
+                }
+                if (building.getDetails().length == 2 && building.getDetails().height == 2) {
+                    insertRoadToGraph(iSubstitute + 1, jSubstitute + 1);
+                }
+                insertRoadToGraph(iSubstitute, jSubstitute);
+
             } else if (building instanceof Toilet) {
                 buildings.add(new Toilet((Toilet) building));
+
+                insertRoadToGraph(iSubstitute, jSubstitute);
+
             } else if (building instanceof TrashBin) {
                 buildings.add(new TrashBin((TrashBin) building));
             } else if (building instanceof Road) {
                 buildings.add(new Road((Road) building));
 
-                ArrayList<Integer> newNode = new ArrayList<>();
-                newNode.add(iSubstitute);
-                newNode.add(jSubstitute);
-                hm.put(v, newNode);
-
-                if (v == 1) {
-                    adj.add(new ArrayList<Integer>());
-                    adj.add(new ArrayList<Integer>());
-                    addEdge(adj, 0, v);
-                } else {
-                    adj.add(new ArrayList<Integer>());
-                    if (iSubstitute + 1 <= 22 && iSubstitute - 1 >= 0) {
-                        if ("road".equals(modelTiles[iSubstitute + 1][jSubstitute].getType())) {
-                            parentRoadI = iSubstitute + 1;
-                            parentRoadJ = jSubstitute;
-
-                            hm.forEach((k, Pvalue) -> {
-                                if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
-                                    parentRoadKey = k;
-                                }
-                            });
-
-                            addEdge(adj, parentRoadKey, v);
-                        }
-
-                        if ("road".equals(modelTiles[iSubstitute - 1][jSubstitute].getType())) {
-                            parentRoadI = iSubstitute - 1;
-                            parentRoadJ = jSubstitute;
-
-                            hm.forEach((k, Pvalue) -> {
-                                if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
-                                    parentRoadKey = k;
-                                }
-                            });
-
-                            addEdge(adj, parentRoadKey, v);
-                        }
-                    }
-
-                    if (jSubstitute + 1 <= 24 && jSubstitute - 1 >= 0) {
-                        if ("road".equals(modelTiles[iSubstitute][jSubstitute + 1].getType())) {
-                            parentRoadI = iSubstitute;
-                            parentRoadJ = jSubstitute + 1;
-
-                            hm.forEach((k, Pvalue) -> {
-                                if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
-                                    parentRoadKey = k;
-                                }
-                            });
-
-                            addEdge(adj, parentRoadKey, v);
-                        }
-                        if ("road".equals(modelTiles[iSubstitute][jSubstitute - 1].getType())) {
-                            parentRoadI = iSubstitute;
-                            parentRoadJ = jSubstitute - 1;
-
-                            hm.forEach((k, Pvalue) -> {
-                                if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
-                                    parentRoadKey = k;
-                                }
-                            });
-
-                            addEdge(adj, parentRoadKey, v);
-                        }
-                    }
-
-                    parentRoadI = 0;
-                    parentRoadJ = 0;
-                    parentRoadKey = 0;
-                }
-                v++;
+                insertRoadToGraph(iSubstitute, jSubstitute);
 
             } else if (building instanceof Plant) {
                 buildings.add(new Plant((Plant) building));
@@ -254,6 +227,81 @@ public class GameEngine {
                 }
             }
         }
+    }
+
+    private void insertRoadToGraph(int iSubstitute, int jSubstitute) {
+        ArrayList<Integer> newNode = new ArrayList<>();
+        newNode.add(iSubstitute);
+        newNode.add(jSubstitute);
+        hm.put(v, newNode);
+
+        if (v == 1) {
+            graph.add(new ArrayList<Integer>());
+            graph.add(new ArrayList<Integer>());
+            addEdge(graph, 0, v);
+        } else {
+            graph.add(new ArrayList<Integer>());
+            if (iSubstitute + 1 <= 22 && iSubstitute - 1 >= 0) {
+                if ("road".equals(modelTiles[iSubstitute + 1][jSubstitute].getType())) {
+                    parentRoadI = iSubstitute + 1;
+                    parentRoadJ = jSubstitute;
+
+                    hm.forEach((k, Pvalue) -> {
+                        if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
+                            parentRoadKey = k;
+                        }
+                    });
+
+                    addEdge(graph, parentRoadKey, v);
+                }
+
+                if ("road".equals(modelTiles[iSubstitute - 1][jSubstitute].getType())) {
+                    parentRoadI = iSubstitute - 1;
+                    parentRoadJ = jSubstitute;
+
+                    hm.forEach((k, Pvalue) -> {
+                        if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
+                            parentRoadKey = k;
+                        }
+                    });
+
+                    addEdge(graph, parentRoadKey, v);
+                }
+            }
+
+            if (jSubstitute + 1 <= 24 && jSubstitute - 1 >= 0) {
+                if ("road".equals(modelTiles[iSubstitute][jSubstitute + 1].getType())) {
+                    parentRoadI = iSubstitute;
+                    parentRoadJ = jSubstitute + 1;
+
+                    hm.forEach((k, Pvalue) -> {
+                        if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
+                            parentRoadKey = k;
+                        }
+                    });
+
+                    addEdge(graph, parentRoadKey, v);
+                }
+                if ("road".equals(modelTiles[iSubstitute][jSubstitute - 1].getType())) {
+                    parentRoadI = iSubstitute;
+                    parentRoadJ = jSubstitute - 1;
+
+                    hm.forEach((k, Pvalue) -> {
+                        if (Pvalue.get(0).equals(parentRoadI) && Pvalue.get(1).equals(parentRoadJ)) {
+                            parentRoadKey = k;
+                        }
+                    });
+
+                    addEdge(graph, parentRoadKey, v);
+                }
+            }
+
+            parentRoadI = 0;
+            parentRoadJ = 0;
+            parentRoadKey = 0;
+        }
+        v++;
+        //System.out.println(graph);
     }
 
     /**
@@ -283,6 +331,19 @@ public class GameEngine {
         int refound = (int) (buildings.get(tempIndex).getBUILDING_COST()) / 2;
         money += refound;
         buildings.set(tempIndex, null);
+
+        hm.forEach((k, Pvalue) -> {
+            if (Pvalue.get(0).equals(iSubstitute) && Pvalue.get(1).equals(jSubstitute)) {
+                hmDeleteIndex = k;
+            }
+        });
+        for (int i = 0; i < graph.size(); i++) {
+            if (i == hmDeleteIndex) {
+                graph.get(i).clear();
+            } else {
+                graph.get(i).remove(new Integer(hmDeleteIndex));
+            }
+        }
     }
 
     public int getMoney() {
@@ -340,17 +401,70 @@ public class GameEngine {
         }
     }
 
-    public int[] findBuilding(ModelTile[][] tiles, String name) {
+    public int[] findBuilding(ModelTile[][] tiles, Building name, int h, int l) {
         int arr[] = new int[2];
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
-                if (tiles[i][j].getType().equals(name)) {
-                    arr[0] = i;
-                    arr[1] = j;
+                if (name.getIndexes().get(0).x == i && name.getIndexes().get(0).y == j) {
+                    if (h == 1 && l == 1) {
+                        arr[0] = i;
+                        arr[1] = j;
+                    }
+                    if (h == 1 && l == 2) {
+                        arr[0] = i;
+                        arr[1] = j - 1;
+                    }
+                    if (h == 2 && l == 1) {
+                        arr[0] = i - 1;
+                        arr[1] = j;
+                    }
+                    if (h == 2 && l == 2) {
+                        arr[0] = i - 1;
+                        arr[1] = j - 1;
+                    }
                 }
             }
         }
-        return arr;
+        int retval[] = new int[2];
+        for (int k = 0; k <= h - 1; k++) {
+            for (int j = 0; j <= l - 1; j++) {
+                if (k == 0 && arr[0] != 0) {
+                    if ("road".equals(modelTiles[arr[0] + k - 1][arr[1] + j].getType())) {
+                        retval[0] = arr[0] + k;
+                        retval[1] = arr[1] + j;
+                    }
+                }
+                if (k == h - 1 && arr[0] + k + 1 <= height - 1) {
+                    if ("road".equals(modelTiles[arr[0] + k + 1][arr[1] + j].getType())) {
+                        retval[0] = arr[0] + k;
+                        retval[1] = arr[1] + j;
+                    }
+                }
+                if (j == 0 && arr[1] != 0) {
+                    if ("road".equals(modelTiles[arr[0] + k][arr[1] + j - 1].getType())) {
+                        retval[0] = arr[0] + k;
+                        retval[1] = arr[1] + j;
+                    }
+                }
+                if (j == l - 1 && arr[1] + j + 1 <= width - 1) {
+                    if ("road".equals(modelTiles[arr[0] + k][arr[1] + j + 1].getType())) {
+                        retval[0] = arr[0] + k;
+                        retval[1] = arr[1] + j;
+                    }
+                }
+            }
+        }
+        return retval;
+    }
+
+    private void getRandomElement() {
+        Random rand = new Random();
+        do {
+            randBuilding = buildings.get(rand.nextInt(buildings.size()));
+        } while (randBuilding.getBUILDING_COST() < 60 || (prevBuild[0] == randBuilding.getIndexes().get(0).x
+                && prevBuild[1] == randBuilding.getIndexes().get(0).y));
+        prevBuild[0] = randBuilding.getIndexes().get(0).x;
+        prevBuild[1] = randBuilding.getIndexes().get(0).y;
     }
 
     private class visitorTimer implements ActionListener {
@@ -372,43 +486,58 @@ public class GameEngine {
             // oda elmenni
             tiles[i][j].remove(visitor);
             tiles[i][j].repaint();
-            int[] buildingCoordinates = findBuilding(modelTiles, "roller_coaster");
+            
+            int[] buildingCoordinates = findBuilding(modelTiles, randBuilding, randBuilding.getDetails().height, randBuilding.getDetails().length);
             //System.out.println(buildingCoordinates[0] + " " + buildingCoordinates[1]);
-            //System.out.println(adj);
-            //System.out.println(hm);
+            //System.out.println(graph);
+            //System.out.println(randBuilding.getName());
 
             hm.forEach((k, Pvalue) -> {
                 if (Pvalue.get(0).equals(i) && Pvalue.get(1).equals(j)) {
                     source = k;
                 }
             });
-            
+
             hm.forEach((k, Pvalue) -> {
-                if (Pvalue.get(0).equals(buildingCoordinates[0]-1) && Pvalue.get(1).equals(buildingCoordinates[1]-2)) {
+                if (Pvalue.get(0).equals(buildingCoordinates[0]) && Pvalue.get(1).equals(buildingCoordinates[1])) {
                     dest = k;
                 }
             });
-            if(buildingCoordinates[0] != 0) {
-                //System.out.println(source);
-                //System.out.println(dest);
-                printShortestDistance(adj, source, dest, v);
+
+            if (buildingCoordinates[0] != 0 && arrived) {
+                //path.clear();
+                printShortestDistance(graph, source, dest, v);
+                //System.out.println(randBuilding.getName());
+                //System.out.println(graph);
+                //System.out.println(path);
+                arrived = false;
             }
-            /**
-             * IDE KELL A PATH FINDING
-             */
-            /*if(buildingCoordinates[0] != 0 && buildingCoordinates[0] != 0)
-            if (i > buildingCoordinates[0] && modelTiles[i - 1][j].getType().equals("road")) {
-                i--;
-            } else if (i < buildingCoordinates[0] && modelTiles[i + 1][j].getType().equals("road")) {
-                i++;
+            if (!arrived) {
+                if ((path.size() - 1 - pathIndex) >= 0) {
+                    posVis = path.get(path.size() - 1 - pathIndex);
+                    i = hm.get(posVis).get(0);
+                    j = hm.get(posVis).get(1);
+                    pathIndex++;
+                }
             }
-            else if (j > buildingCoordinates[1] && modelTiles[i][j - 1].getType().equals("road")) {
-                j--;
-            } else if (j < buildingCoordinates[1] && modelTiles[i][j + 1].getType().equals("road")) {
-                j++;
-            }*/ 
-            tiles[i][j].add(visitor);
-            tiles[i][j].repaint();
+
+            if (source == dest) {
+                pathIndex = 0;
+                posVis = 0;
+                arrived = true;
+                tiles[i][j].remove(visitor);
+                tiles[i][j].repaint();
+                getRandomElement();
+                path.clear();
+            } else {
+                tiles[i][j].add(visitor);
+                tiles[i][j].repaint();
+            }
+            if(edge) {
+                getRandomElement();
+                edge = false;
+            }
+
         }
     }
 
@@ -581,7 +710,7 @@ public class GameEngine {
 
     // function to print the shortest distance and path
     // between source vertex and destination vertex
-    private static void printShortestDistance(
+    private void printShortestDistance(
             ArrayList<ArrayList<Integer>> adj,
             int s, int dest, int v) {
         // predecessor[i] array stores predecessor of
@@ -591,13 +720,12 @@ public class GameEngine {
         int dist[] = new int[v];
 
         if (BFS(adj, s, dest, v, pred, dist) == false) {
-            System.out.println("Given source and destination"
-                    + "are not connected");
+            //System.out.println("Given source and destination"
+            //        + "are not connected");
+            edge = true;
             return;
         }
 
-        // LinkedList to store path
-        LinkedList<Integer> path = new LinkedList<Integer>();
         int crawl = dest;
         path.add(crawl);
         while (pred[crawl] != -1) {
@@ -606,13 +734,14 @@ public class GameEngine {
         }
 
         // Print distance
-        System.out.println("Shortest path length is: " + dist[dest]);
+        //System.out.println("Shortest path length is: " + dist[dest]);
 
         // Print path
-        System.out.println("Path is ::");
-        for (int i = path.size() - 1; i >= 0; i--) {
-            System.out.print(path.get(i) + " ");
-        }
+        //System.out.println("Path is ::");
+        //for (int i = path.size() - 1; i >= 0; i--) {
+        //    System.out.print(path.get(i) + " ");
+        //}
+        //path.clear();
     }
 
     // a modified version of BFS that stores predecessor
