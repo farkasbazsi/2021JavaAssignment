@@ -4,6 +4,7 @@ import game.GameEngine;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -35,6 +36,7 @@ public class FfnProject extends JFrame {
     private Timer gameTime;
     private int currentTime = 0;
     private Payment payment;
+    private int buildingNum = 0;
 
     private GameEngine engine;
 
@@ -92,13 +94,15 @@ public class FfnProject extends JFrame {
 
         playTimer = new Timer(100, new playTimerListener());
         playTimer.start();
-        
+
         //Test phase
         //BEGIN
-        gameTime = new Timer(1000,new gameTimerListener());
-        gameTime.start();
+        gameTime = new Timer(1000, new gameTimerListener());
         //END
         
+        URL url = getClass().getResource("../res/dojo.png");
+        setIconImage(Toolkit.getDefaultToolkit().getImage(url));
+
         setSize(1080, 1920); //1200,850
         setResizable(false);
         pack();
@@ -107,6 +111,7 @@ public class FfnProject extends JFrame {
     }
 
     private class gameTimerListener implements ActionListener {
+
         @Override
         public void actionPerformed(ActionEvent arg0) {
             currentTime++;
@@ -123,8 +128,8 @@ public class FfnProject extends JFrame {
     }
 
     /**
-     * Gets the attributes of the buildings from the buildings.txt.
-     * Insert them to the buildings arraylist.
+     * Gets the attributes of the buildings from the buildings.txt. Insert them
+     * to the buildings arraylist.
      *
      * @param
      */
@@ -176,10 +181,9 @@ public class FfnProject extends JFrame {
     }
 
     /**
-     * Fill the right sided pane with content.
-     * In this pane the player can change the different fees,
-     * set which games to be free to use,
-     * and open the park.
+     * Fill the right sided pane with content. In this pane the player can
+     * change the different fees, set which games to be free to use, and open
+     * the park.
      *
      */
     private void fillEastPanel() {
@@ -283,12 +287,27 @@ public class FfnProject extends JFrame {
         openbutton.setText("Park megnyitása");
         openbutton.setPreferredSize(new Dimension(100, 40));
         openbutton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        
+
         openbutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                engine.openPark();
-                openbutton.setEnabled(false);
+                for(int i = 0; i < engine.buildings.size(); i++) {
+                    if(engine.buildings.get(i).getBUILDING_COST() >= 60) {
+                        buildingNum++;
+                    }
+                }
+                if (buildingNum < 5) {
+                    showMessage();
+                    buildingNum = 0;
+                } else {
+                    try {
+                        engine.openPark();
+                    } catch (IOException ex) {
+                        Logger.getLogger(FfnProject.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    openbutton.setEnabled(false);
+                    gameTime.start();
+                }
             }
         });
 
@@ -297,19 +316,23 @@ public class FfnProject extends JFrame {
         eastPanel.add(checkPanel);
         eastPanel.add(openbutton);
     }
+    
+    private void showMessage() {
+        JOptionPane.showMessageDialog(this, "A minimális épületszámot (5) el kell érnie a parknak a megnyitáshoz!", "Park megnyitása",
+                JOptionPane.INFORMATION_MESSAGE);
+    }
 
     private void updateSouthLabelText() {
         southLabel.setText("Egyenleg: " + engine.getMoney() + "Ft       Látogatók száma: "
                 + engine.getVisitorsCount() + " fő       Boldogság szintje: " + engine.getAvgHappiness()
                 + "%        Park összértéke: " + engine.getParkValue() + "Ft       "
-                + "Indítás óta eltelt idő: "+ (currentTime < 60 ? currentTime + " mp" : currentTime < 3600 ? currentTime / 60 + " perc " + currentTime % 60 + " másodperc" : 
-                currentTime / 3600 + " óra " + currentTime % 3600 + " perc"));
+                + "Megnyitás óta eltelt idő: " + (currentTime < 60 ? currentTime + " mp" : currentTime < 3600 ? currentTime / 60 + " perc " + currentTime % 60 + " másodperc"
+                                : currentTime / 3600 + " óra " + currentTime % 3600 + " perc"));
     }
 
     /**
-     * Fill the left sided pane with content.
-     * From this pane the player can insert buildings into the park,
-     * and destroy them by the bulldozer icon.
+     * Fill the left sided pane with content. From this pane the player can
+     * insert buildings into the park, and destroy them by the bulldozer icon.
      *
      * @throws IOException , if the ResourceLoader can't find the pictures
      */
@@ -397,7 +420,7 @@ public class FfnProject extends JFrame {
                     } catch (IOException ex) {
                         Logger.getLogger(FfnProject.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    */
+                     */
                     Bbutton.setBackground(Color.red.brighter());
                     Bbutton.setOpaque(true);
                 } else {
@@ -411,7 +434,7 @@ public class FfnProject extends JFrame {
                     } catch (IOException ex) {
                         Logger.getLogger(FfnProject.class.getName()).log(Level.SEVERE, null, ex);
                     }
-                    */
+                     */
                     Bbutton.setBackground(Color.red.brighter());
                     Bbutton.setOpaque(true);
                 }
@@ -444,7 +467,6 @@ public class FfnProject extends JFrame {
             System.exit(0);
         }
     }
-    
 
     public static void main(String[] args) throws IOException {
         FfnProject project = new FfnProject();
