@@ -42,7 +42,7 @@ public class GameEngine {
     private ArrayList<Worker> workers = new ArrayList<>();
     public ArrayList<Building> buildings;
     private ArrayList<Visitor> visitors = new ArrayList<>();
-    private Payment payment;
+    private Payment payment = new Payment();
 
     private ModelTile[][] modelTiles;
     private Tile[][] tiles;
@@ -572,9 +572,12 @@ public class GameEngine {
                     visitor.posVis = 0;
                     visitor.arrived = true;
                     tiles[visitor.i][visitor.j].remove(visitor);
+                    //várni kellene egy kicsit maybe
                     tiles[visitor.i][visitor.j].repaint();
                     getRandomElement(visitor);
                     visitor.path.clear();
+                    visitor.changeHappiness(20);
+                    visitor.useRide(payment.getGamesFee());
                 } else {
                     tiles[visitor.i][visitor.j].add(visitor);
                     tiles[visitor.i][visitor.j].repaint();

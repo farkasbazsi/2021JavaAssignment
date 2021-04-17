@@ -112,4 +112,26 @@ public class Payment {
         slider.setPaintLabels(true);
         return slider;
     }
+
+    public int getEntranceFee() {
+        return entranceFee;
+    }
+
+    public int getWorkerFee() {
+        return workerFee;
+    }
+
+    public int getGamesFee() {
+        return gamesFee;
+    }
+
+    public int getRestaurantFee() {
+        return restaurantFee;
+    }
+
+    public int getToiletFee() {
+        return toiletFee;
+    }
+    
+    
 }
