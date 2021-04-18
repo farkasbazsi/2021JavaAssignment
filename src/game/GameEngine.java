@@ -576,7 +576,7 @@ public class GameEngine {
                     tiles[visitor.i][visitor.j].repaint();
                     getRandomElement(visitor);
                     visitor.path.clear();
-                    visitor.changeHappiness(20);
+                    visitor.changeHappiness(10-(10*visitor.getHunger()/100));
                     visitor.useRide(payment.getGamesFee());
                 } else {
                     tiles[visitor.i][visitor.j].add(visitor);

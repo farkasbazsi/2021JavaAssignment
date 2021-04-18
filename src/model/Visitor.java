@@ -46,11 +46,11 @@ public class Visitor extends JPanel {
     public Visitor(Details details, BufferedImage image) {
         this.details = details;
         this.image = image;
-        timer = new Timer(4000, new visitorTimer());
+        timer = new Timer(1000, new visitorTimer());
         timer.start();
         subTimer = new Timer(1000, new subTimer());
         subTimer.start();
-        happiness = 100;
+        happiness = (int) ((Math.random() * (100 - 60)) + 60);
         money = 1000;
         hunger = 0;
     }
@@ -87,9 +87,9 @@ public class Visitor extends JPanel {
      * @param amount 
      */
     public void changeHappiness(int amount){
-        if(happiness + amount > 100){
+        if(happiness + amount >= 100){
             happiness = 100;
-        }else if(happiness - amount < 0){
+        }else if(happiness + amount <= 0){
             happiness = 0; // Tiszta én
         }else{
             happiness+=amount;
