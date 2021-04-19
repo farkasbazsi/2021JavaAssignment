@@ -44,11 +44,11 @@ public class GameEngine {
     
     private ArrayList<String> freeGames = new ArrayList<>();
 
-    private ModelTile[][] modelTiles;
-    private Tile[][] tiles;
+    ModelTile[][] modelTiles;
+    Tile[][] tiles;
     private final int height = 23;
     private final int width = 25;
-    private Building building;
+    Building building;
     private boolean destroy;
 
     private Hashtable<Integer, ArrayList<Integer>> hm = new Hashtable<>();
