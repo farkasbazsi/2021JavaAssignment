@@ -51,8 +51,8 @@ public class Visitor extends JPanel {
         subTimer = new Timer(1000, new subTimer());
         subTimer.start();
         happiness = (int) ((Math.random() * (100 - 60)) + 60);
-        money = 1000;
-        hunger = 0;
+        money = (int) ((Math.random() * (1000 - 600)) + 600);
+        hunger = (int) ((Math.random() * (30 - 0)) + 0);
     }
 
     @Override
@@ -78,7 +78,7 @@ public class Visitor extends JPanel {
     }
 
     public void useRide(int price) {
-        if(money - price > 0) money -= price;
+        if(money - price >= 0) money -= price;
         else money = 0;
     }
     /**
@@ -116,7 +116,7 @@ public class Visitor extends JPanel {
 
     private class visitorTimer implements ActionListener {
         /**
-         * Every 4 second visitors hunger increases by 1;
+         * Every 2 second visitors hunger increases by 1;
          * @param arg0 
          */
         @Override
