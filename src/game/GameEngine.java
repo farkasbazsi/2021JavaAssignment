@@ -41,6 +41,8 @@ public class GameEngine {
     public ArrayList<Building> buildings;
     private ArrayList<Visitor> visitors = new ArrayList<>();
     private Payment payment = new Payment();
+    
+    private ArrayList<String> freeGames = new ArrayList<>();
 
     private ModelTile[][] modelTiles;
     private Tile[][] tiles;
@@ -417,6 +419,10 @@ public class GameEngine {
             }
         }
         return sum;
+    }
+
+    public ArrayList<String> getFreeGames() {
+        return freeGames;
     }
 
     private void newGame() {

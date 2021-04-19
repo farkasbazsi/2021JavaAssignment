@@ -31,11 +31,9 @@ public class FfnProject extends JFrame {
     private ArrayList<JButton> buttons = new ArrayList<>();
     private int chosenIndex;
 
-    private ArrayList<String> freeGames = new ArrayList<>();
     private Timer playTimer;
     private Timer gameTime;
     private int currentTime = 0;
-    //private Payment payment;
     private int buildingNum = 0;
 
     private GameEngine engine;
@@ -48,9 +46,7 @@ public class FfnProject extends JFrame {
         southLabel = new JLabel();
 
         centerPanel = new JPanel();
-        //engine = new GameEngine(centerPanel);
 
-        //payment = new Payment();
         read_buildings();
 
         westPanel = new JPanel();
@@ -273,11 +269,10 @@ public class FfnProject extends JFrame {
 
             cb.addItemListener((ItemEvent arg0) -> {
                 if (cb.isSelected()) {
-                    freeGames.add(cb.getText());
+                    engine.getFreeGames().add(cb.getText());
                 } else {
-                    freeGames.remove(cb.getText());
+                    engine.getFreeGames().remove(cb.getText());
                 }
-                //System.out.println(freeGames);
             });
 
             checkPanel.add(cb);
@@ -405,36 +400,15 @@ public class FfnProject extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (engine.isDestroy()) {
                     engine.setDestroy(false);
-                    //centerPanel.setCursor(Cursor.getDefaultCursor());
                     Bbutton.setBackground(null);
                 } else if (engine.getBuilding() != null) {
                     engine.setBuilding(null);
                     buttons.get(chosenIndex).setBackground(null);
                     engine.setDestroy(true);
-                    /*
-                    Toolkit toolkit = Toolkit.getDefaultToolkit();
-                    try {
-                        //Cursor c = toolkit.createCustomCursor(ResourceLoader.loadImage("res/delete.ani"),new Point(centerPanel.getX(),centerPanel.getY()), "img");
-                        Cursor c = toolkit.createCustomCursor(ResourceLoader.loadImage("res/delete.ani"),new Point(0, 0),"img");
-                        centerPanel.setCursor(c);
-                    } catch (IOException ex) {
-                        Logger.getLogger(FfnProject.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                     */
                     Bbutton.setBackground(Color.red.brighter());
                     Bbutton.setOpaque(true);
                 } else {
                     engine.setDestroy(true);
-                    /*
-                    Toolkit toolkit = Toolkit.getDefaultToolkit();
-                    try {
-                        //Cursor c = toolkit.createCustomCursor(ResourceLoader.loadImage("res/delete.ani"),new Point(centerPanel.getX(),centerPanel.getY()), "img");
-                        Cursor c = toolkit.createCustomCursor(ResourceLoader.loadImage("res/delete.ani"),new Point(0, 0),"img");
-                        centerPanel.setCursor(c);
-                    } catch (IOException ex) {
-                        Logger.getLogger(FfnProject.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                     */
                     Bbutton.setBackground(Color.red.brighter());
                     Bbutton.setOpaque(true);
                 }
