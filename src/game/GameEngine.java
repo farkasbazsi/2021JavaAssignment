@@ -105,7 +105,7 @@ public class GameEngine {
 
                 } else {
                     modelTiles[i][j] = new ModelTile("grass");
-                    tiles[i][j] = new Tile(ResourceLoader.loadImage("res/grass.png"));
+                    tiles[i][j] = new Tile(ResourceLoader.loadImage("res/Grass.png"));
                 }
 
                 tiles[i][j].addMouseListener(new mouseListener(i, j));

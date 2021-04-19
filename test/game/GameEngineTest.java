@@ -20,7 +20,8 @@ public class GameEngineTest {
     
     @BeforeClass
     public static void engineConstruct() throws IOException{
-        engine = new GameEngine(new JPanel(),new Road(new Details("road.png",1,1),10,"road"));
+        Building building =new Road(new Details("road.png",1,1),10,"road");
+        engine = new GameEngine(new JPanel(),building);
         engine.building = new Ride(new Details("target.png",2,2),15,"target_shooting");
     }
     
