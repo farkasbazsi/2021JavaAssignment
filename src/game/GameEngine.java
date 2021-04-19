@@ -12,12 +12,10 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.LinkedList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 import model.Details;
@@ -139,6 +137,12 @@ public class GameEngine {
         t.start();
         arrival.start();
         getRandomElement(visitor);
+        
+        //a belépődíjból lejön a fenntartási költség (kezdetleges)
+        int sum = 0;
+        for(Building b : buildings){
+            if(b !=null && !(b instanceof Road)) {sum+=(int)b.getBUILDING_COST()/20;}}
+        money += payment.getEntranceFee()-sum;
     }
 
     /**
@@ -752,6 +756,10 @@ public class GameEngine {
 
     public boolean isDestroy() {
         return destroy;
+    }
+
+    public Payment getPayment() {
+        return payment;
     }
 
     /**
