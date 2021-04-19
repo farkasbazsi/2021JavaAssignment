@@ -35,7 +35,7 @@ public class FfnProject extends JFrame {
     private Timer playTimer;
     private Timer gameTime;
     private int currentTime = 0;
-    private Payment payment;
+    //private Payment payment;
     private int buildingNum = 0;
 
     private GameEngine engine;
@@ -50,7 +50,7 @@ public class FfnProject extends JFrame {
         centerPanel = new JPanel();
         //engine = new GameEngine(centerPanel);
 
-        payment = new Payment();
+        //payment = new Payment();
         read_buildings();
 
         westPanel = new JPanel();
@@ -214,7 +214,7 @@ public class FfnProject extends JFrame {
         entranceFeebutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                payment.setEntranceFee(100);
+                engine.getPayment().setEntranceFee(100);
             }
         });
 
@@ -226,7 +226,7 @@ public class FfnProject extends JFrame {
         workerFeebutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                payment.setWorkerFee(30);
+                engine.getPayment().setWorkerFee(30);
             }
         });
 
@@ -238,7 +238,7 @@ public class FfnProject extends JFrame {
         gamesFeebutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                payment.setGamesFee(60);
+                engine.getPayment().setGamesFee(60);
             }
         });
 
@@ -250,7 +250,7 @@ public class FfnProject extends JFrame {
         restaurantFeebutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                payment.setRestaurantFee(50);
+                engine.getPayment().setRestaurantFee(50);
             }
         });
 
@@ -262,7 +262,7 @@ public class FfnProject extends JFrame {
         toiletFeebutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                payment.setToiletFee(10);
+                engine.getPayment().setToiletFee(10);
             }
         });
 
@@ -292,7 +292,7 @@ public class FfnProject extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 for(int i = 0; i < engine.buildings.size(); i++) {
-                    if(engine.buildings.get(i).getBUILDING_COST() >= 60) {
+                    if(engine.buildings.get(i)!= null && engine.buildings.get(i).getBUILDING_COST() >= 60) {
                         buildingNum++;
                     }
                 }
