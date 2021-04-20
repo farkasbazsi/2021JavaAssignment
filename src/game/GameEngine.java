@@ -23,6 +23,7 @@ import model.ModelTile;
 import model.Payment;
 import model.Tile;
 import model.worker.Worker;
+import model.worker.Cleaner;
 import model.building.Building;
 import model.Visitor;
 import model.building.Plant;
@@ -41,7 +42,7 @@ public class GameEngine {
     public ArrayList<Building> buildings;
     private ArrayList<Visitor> visitors = new ArrayList<>();
     private Payment payment = new Payment();
-    
+
     private ArrayList<String> freeGames = new ArrayList<>();
 
     ModelTile[][] modelTiles;
@@ -67,6 +68,8 @@ public class GameEngine {
 
     private boolean edge = false;
 
+    Timer wT = new Timer(600, new workerTimer());
+
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
         this.money = 10000;
@@ -77,6 +80,8 @@ public class GameEngine {
         destroy = false;
 
         generateField(panel, spawnRoad);
+
+        wT.start();
     }
 
     /**
@@ -139,17 +144,20 @@ public class GameEngine {
         t.start();
         arrival.start();
         getRandomElement(visitor);
-        
+
         //a belépődíjból lejön a fenntartási költség (kezdetleges)
         int sum = 0;
-        for(Building b : buildings){
-            if(b !=null && !(b instanceof Road)) {sum+=(int)b.getBUILDING_COST()/20;}}
-        money += payment.getEntranceFee()-sum;
+        for (Building b : buildings) {
+            if (b != null && !(b instanceof Road)) {
+                sum += (int) b.getBUILDING_COST() / 20;
+            }
+        }
+        money += payment.getEntranceFee() - sum;
     }
 
     /**
-     * Insert new visitor in every five seconds, until the visitors number
-     * less than 5.
+     * Insert new visitor in every five seconds, until the visitors number less
+     * than 5.
      *
      */
     private class arrivalTimer implements ActionListener {
@@ -178,7 +186,7 @@ public class GameEngine {
      * @param iSubstitute, i index of matrixes.
      * @param jSubstitute, j index of matrixes.
      */
-    private void createBuilding(int iSubstitute, int jSubstitute) {
+    private void createBuilding(int iSubstitute, int jSubstitute) throws IOException {
         boolean full = true;
         int ind = -1;
         for (int i = 0; i < buildings.size(); i++) {
@@ -242,6 +250,8 @@ public class GameEngine {
             } else if (building instanceof Road) {
                 buildings.add(new Road((Road) building));
 
+                Road temp = (Road) buildings.get(buildings.size() - 1);
+                temp.setTrashOnIt(true);
                 insertRoadToGraph(iSubstitute, jSubstitute);
 
             } else if (building instanceof Plant) {
@@ -268,9 +278,8 @@ public class GameEngine {
     }
 
     /**
-     * When the player builds one tile road, this function
-     * insert a new node to the graph. The new node represents
-     * the road with a hashtable.
+     * When the player builds one tile road, this function insert a new node to
+     * the graph. The new node represents the road with a hashtable.
      *
      * @param iSubstitute
      * @param jSubstitute
@@ -433,8 +442,14 @@ public class GameEngine {
 
     }
 
-    private void newWorker() {
+    public void newCleaner() throws IOException {
+        Details dt = new Details("res/cleaner.png", 10, 10);
+        BufferedImage icon = (BufferedImage) ResourceLoader.loadImage(dt.image);
+        Cleaner cleaner = new Cleaner(dt, icon);
+        tiles[22][12].add(cleaner);
+        workers.add(cleaner);
 
+        getRandomRoad(cleaner);
     }
 
     private void removeWorker(int id) {
@@ -515,6 +530,18 @@ public class GameEngine {
         return retval;
     }
 
+    private void getRandomRoad(Worker worker) {
+        Random rand = new Random();
+        do {
+            do {
+                worker.randBuilding = buildings.get(rand.nextInt(buildings.size()));
+            } while (worker.randBuilding == null);
+        } while (!(worker.randBuilding instanceof Road) || (worker.prevBuild[0] == worker.randBuilding.getIndexes().get(0).x
+                && worker.prevBuild[1] == worker.randBuilding.getIndexes().get(0).y));
+        worker.prevBuild[0] = worker.randBuilding.getIndexes().get(0).x;
+        worker.prevBuild[1] = worker.randBuilding.getIndexes().get(0).y;
+    }
+
     /**
      * Give back a random building from buildings arraylist.
      *
@@ -530,6 +557,90 @@ public class GameEngine {
                 && visitor.prevBuild[1] == visitor.randBuilding.getIndexes().get(0).y));
         visitor.prevBuild[0] = visitor.randBuilding.getIndexes().get(0).x;
         visitor.prevBuild[1] = visitor.randBuilding.getIndexes().get(0).y;
+    }
+
+    /*
+        Bugos, ha ki van választva a road akkor nem jelennek meg a bespawnoló cleanerek
+     */
+    private class workerTimer implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            for (Worker worker : workers) {
+                //System.out.printf(worker.randBuilding.toString());
+
+                Road i = (Road) buildings.get(modelTiles[worker.i][worker.j].getIndex());
+                boolean x = i.hasTrashOnIt();
+                if (x) {
+                    //buildings.get(modelTiles[worker.i][worker.j].getIndex()).setTrashOnIt(false);
+                    i.setTrashOnIt(false);
+                    try {
+                        //Image image = new Image(ResourceLoader.loadImage("res/grass.png"));
+                        tiles[worker.i][worker.j].setImage(ResourceLoader.loadImage("res/road.png"));
+                    } catch (IOException ex) {
+                        Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+
+                tiles[worker.i][worker.j].remove(worker);
+                tiles[worker.i][worker.j].repaint();
+
+                int[] buildingCoordinates = new int[2];
+                buildingCoordinates[0] = (int) worker.randBuilding.getIndexes().get(0).getX();
+                buildingCoordinates[1] = (int) worker.randBuilding.getIndexes().get(0).getY();
+                //(int)worker.randBuilding.getIndexes().get(0).getY()]; //findBuilding(modelTiles, visitor.randBuilding, visitor.randBuilding.getDetails().height, visitor.randBuilding.getDetails().length);
+                //System.out.println(buildingCoordinates[0] + " " + buildingCoordinates[1]);
+                //System.out.println(graph);
+                //System.out.println(randBuilding.getName());
+
+                hm.forEach((k, Pvalue) -> {
+                    if (Pvalue.get(0).equals(worker.i) && Pvalue.get(1).equals(worker.j)) {
+                        worker.source = k;
+                    }
+                });
+
+                hm.forEach((k, Pvalue) -> {
+                    if (Pvalue.get(0).equals(buildingCoordinates[0]) && Pvalue.get(1).equals(buildingCoordinates[1])) {
+                        worker.dest = k;
+                    }
+                });
+
+                if (buildingCoordinates[0] != 0 && worker.arrived) {
+                    //path.clear();
+                    worker.printShortestDistance(graph, worker.source, worker.dest, v);
+                    //System.out.println(randBuilding.getName());
+                    //System.out.println(graph);
+                    //System.out.println(dest);
+                    worker.arrived = false;
+                }
+                if (!worker.arrived) {
+                    if ((worker.path.size() - 1 - worker.pathIndex) >= 0) {
+                        worker.posVis = worker.path.get(worker.path.size() - 1 - worker.pathIndex);
+                        worker.i = hm.get(worker.posVis).get(0);
+                        worker.j = hm.get(worker.posVis).get(1);
+                        worker.pathIndex++;
+                    }
+                }
+
+                if (worker.source == worker.dest) {
+                    worker.pathIndex = 0;
+                    worker.posVis = 0;
+                    worker.arrived = true;
+                    //tiles[worker.i][worker.j].remove(worker);
+                    //várni kellene egy kicsit maybe
+                    tiles[worker.i][worker.j].add(worker);
+                    tiles[worker.i][worker.j].repaint();
+                    getRandomRoad(worker);
+                    worker.path.clear();
+                    //visitor.changeHappiness(10-(10*visitor.getHunger()/100));
+                    //visitor.useRide(payment.getGamesFee());
+                } else {
+                    tiles[worker.i][worker.j].add(worker);
+                    tiles[worker.i][worker.j].repaint();
+                }
+            }
+            //System.out.printf("------\n");
+        }
     }
 
     /**
@@ -586,7 +697,7 @@ public class GameEngine {
                     tiles[visitor.i][visitor.j].repaint();
                     getRandomElement(visitor);
                     visitor.path.clear();
-                    visitor.changeHappiness(10-(10*visitor.getHunger()/100));
+                    visitor.changeHappiness(10 - (10 * visitor.getHunger() / 100));
                     visitor.useRide(payment.getGamesFee());
                 } else {
                     tiles[visitor.i][visitor.j].add(visitor);
@@ -655,7 +766,11 @@ public class GameEngine {
                         }
 
                         if (free && nearRoad(iSubstitute, jSubstitute)) {
-                            createBuilding(iSubstitute, jSubstitute);
+                            try {
+                                createBuilding(iSubstitute, jSubstitute);
+                            } catch (IOException ex) {
+                                Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                             money -= building.getBUILDING_COST();
                         }
                     }

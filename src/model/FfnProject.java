@@ -95,7 +95,7 @@ public class FfnProject extends JFrame {
         //BEGIN
         gameTime = new Timer(1000, new gameTimerListener());
         //END
-        
+
         URL url = getClass().getResource("../res/dojo.png");
         setIconImage(Toolkit.getDefaultToolkit().getImage(url));
 
@@ -204,7 +204,7 @@ public class FfnProject extends JFrame {
 
         JButton entranceFeebutton = new JButton();
         entranceFeebutton.setText("Belépődíj");
-        entranceFeebutton.setPreferredSize(new Dimension(120, 40));
+        entranceFeebutton.setPreferredSize(new Dimension(120, 30));
         buttonPanel.add(entranceFeebutton);
 
         entranceFeebutton.addActionListener(new ActionListener() {
@@ -216,7 +216,7 @@ public class FfnProject extends JFrame {
 
         JButton workerFeebutton = new JButton();
         workerFeebutton.setText("Dolgozói bérek");
-        workerFeebutton.setPreferredSize(new Dimension(120, 40));
+        workerFeebutton.setPreferredSize(new Dimension(120, 30));
         buttonPanel.add(workerFeebutton);
 
         workerFeebutton.addActionListener(new ActionListener() {
@@ -228,7 +228,7 @@ public class FfnProject extends JFrame {
 
         JButton gamesFeebutton = new JButton();
         gamesFeebutton.setText("Játékok ára");
-        gamesFeebutton.setPreferredSize(new Dimension(120, 40));
+        gamesFeebutton.setPreferredSize(new Dimension(120, 30));
         buttonPanel.add(gamesFeebutton);
 
         gamesFeebutton.addActionListener(new ActionListener() {
@@ -240,7 +240,7 @@ public class FfnProject extends JFrame {
 
         JButton restaurantFeebutton = new JButton();
         restaurantFeebutton.setText("Éttermek ára");
-        restaurantFeebutton.setPreferredSize(new Dimension(120, 40));
+        restaurantFeebutton.setPreferredSize(new Dimension(120, 30));
         buttonPanel.add(restaurantFeebutton);
 
         restaurantFeebutton.addActionListener(new ActionListener() {
@@ -252,13 +252,29 @@ public class FfnProject extends JFrame {
 
         JButton toiletFeebutton = new JButton();
         toiletFeebutton.setText("Mosdó ára");
-        toiletFeebutton.setPreferredSize(new Dimension(120, 40));
+        toiletFeebutton.setPreferredSize(new Dimension(120, 30));
         buttonPanel.add(toiletFeebutton);
 
         toiletFeebutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 engine.getPayment().setToiletFee(10);
+            }
+        });
+
+        JButton hireCleanerButton = new JButton();
+        hireCleanerButton.setText("+Takarító");
+        hireCleanerButton.setPreferredSize(new Dimension(120, 30));
+        buttonPanel.add(hireCleanerButton);
+
+        hireCleanerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    engine.newCleaner();
+                } catch (IOException ex) {
+                    Logger.getLogger(FfnProject.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
 
@@ -286,8 +302,8 @@ public class FfnProject extends JFrame {
         openbutton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                for(int i = 0; i < engine.buildings.size(); i++) {
-                    if(engine.buildings.get(i)!= null && engine.buildings.get(i).getBUILDING_COST() >= 60) {
+                for (int i = 0; i < engine.buildings.size(); i++) {
+                    if (engine.buildings.get(i) != null && engine.buildings.get(i).getBUILDING_COST() >= 60) {
                         buildingNum++;
                     }
                 }
@@ -311,7 +327,7 @@ public class FfnProject extends JFrame {
         eastPanel.add(checkPanel);
         eastPanel.add(openbutton);
     }
-    
+
     private void showMessage() {
         JOptionPane.showMessageDialog(this, "A minimális épületszámot (5) el kell érnie a parknak a megnyitáshoz!", "Park megnyitása",
                 JOptionPane.INFORMATION_MESSAGE);

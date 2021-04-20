@@ -13,4 +13,4 @@ toilet toilet.png 1 1 60 toilet
 trash_bin bin.png 1 1 50 trash
 tree tree.png 2 1 20 plant
 bush bush.png 1 1 15 plant
-road road.png 1 1 10 road
+road garbage.png 1 1 10 road
