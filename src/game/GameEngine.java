@@ -776,8 +776,12 @@ public class GameEngine {
                     getRandomElement(visitor);
                     visitor.path.clear();
                     visitor.changeHappiness(10 - (10 * visitor.getHunger() / 100));
-                    visitor.useRide(payment.getGamesFee());
-
+                    
+                    if(!freeGames.contains(modelTiles[visitor.i][visitor.j].getType())){
+                        visitor.useRide(payment.getGamesFee());
+                        money = money + payment.getGamesFee();
+                    }
+                    
                     if ("buffet".equals(modelTiles[visitor.i][visitor.j].getType())
                             || "restaurant".equals(modelTiles[visitor.i][visitor.j].getType())) {
                         visitor.tilesUntillTrash = 5;
