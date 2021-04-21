@@ -187,7 +187,7 @@ public class FfnProject extends JFrame {
         buttonPanel.setBackground(Color.LIGHT_GRAY);
         JPanel checkPanel = new JPanel();
         checkPanel.setBackground(Color.LIGHT_GRAY);
-        checkPanel.setPreferredSize(new Dimension(170, 150));
+        checkPanel.setPreferredSize(new Dimension(170, 50));//170, 150 a munkás buttonok felvételekor változott
         JLabel checkLabel = new JLabel("<html><div style='text-align: center;'>"
                 + "A belépődíj<br>az alábbi játékokat<br>tartalmazza</html>");
         Border border = checkLabel.getBorder();
@@ -197,9 +197,9 @@ public class FfnProject extends JFrame {
 
         eastPanel.setLayout(new BoxLayout(eastPanel, BoxLayout.PAGE_AXIS));
 
-        JLabel eastLabel = new JLabel("Árak megadása");
+        JLabel eastLabel = new JLabel("Beállítások");
         eastLabel.setFont(new Font("Calibri", Font.BOLD, 16));
-        eastLabel.setPreferredSize(new Dimension(170, 80));
+        eastLabel.setPreferredSize(new Dimension(170, 50)); // 170, 80 a munkás buttonok felvételekor változott
         eastLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JButton entranceFeebutton = new JButton();
@@ -275,6 +275,42 @@ public class FfnProject extends JFrame {
                 } catch (IOException ex) {
                     Logger.getLogger(FfnProject.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+        });
+
+        JButton fireCleanerButton = new JButton();
+        fireCleanerButton.setText("-Takarító");
+        fireCleanerButton.setPreferredSize(new Dimension(120, 30));
+        buttonPanel.add(fireCleanerButton);
+
+        fireCleanerButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                engine.fireCleaner();
+            }
+        });
+        
+        JButton newMechanicButton = new JButton();
+        newMechanicButton.setText("+Szerelő");
+        newMechanicButton.setPreferredSize(new Dimension(120, 30));
+        buttonPanel.add(newMechanicButton);
+
+        newMechanicButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //engine.fireCleaner();
+            }
+        });
+        
+        JButton fireMechanicButton = new JButton();
+        fireMechanicButton.setText("-Szerelő");
+        fireMechanicButton.setPreferredSize(new Dimension(120, 30));
+        buttonPanel.add(fireMechanicButton);
+
+        fireMechanicButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                //engine.fireCleaner();
             }
         });
 

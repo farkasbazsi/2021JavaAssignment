@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
+import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -26,6 +27,7 @@ import model.worker.Worker;
 import model.worker.Cleaner;
 import model.building.Building;
 import model.Visitor;
+import model.building.BuildingState;
 import model.building.Plant;
 import model.building.Restaurant;
 import model.building.Ride;
@@ -149,7 +151,7 @@ public class GameEngine {
         int sum = 0;
         for (Building b : buildings) {
             if (b != null && !(b instanceof Road)) {
-                sum += (int) b.getBUILDING_COST() / 20;
+                sum += (int) b.getBUILDING_COST() / 50;
             }
         }
         money += payment.getEntranceFee() - sum;
@@ -261,17 +263,61 @@ public class GameEngine {
             }
             ind = buildings.size() - 1;
         }
-        for (int k = 0; k <= building.getDetails().height - 1; k++) {
-            for (int l = 0; l <= building.getDetails().length - 1; l++) {
-                try {
-                    buildings.get(ind).getIndexes().add(new Point(iSubstitute + k, jSubstitute + l));
-                    modelTiles[iSubstitute + k][jSubstitute + l].setType(building.getName());
-                    modelTiles[iSubstitute + k][jSubstitute + l].setIndex(ind);
-                    tiles[iSubstitute + k][jSubstitute + l].setImage(
-                            ResourceLoader.loadImage("res/" + buildings.get(ind).getDetails().image));
-                    tiles[iSubstitute + k][jSubstitute + l].repaint();
-                } catch (IOException ex) {
-                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+
+        if (building instanceof Restaurant || building instanceof Ride) {
+
+            for (int k = 0; k <= building.getDetails().height - 1; k++) {
+                for (int l = 0; l <= building.getDetails().length - 1; l++) {
+                    try {
+                        buildings.get(ind).getIndexes().add(new Point(iSubstitute + k, jSubstitute + l));
+                        modelTiles[iSubstitute + k][jSubstitute + l].setType(building.getName());
+                        modelTiles[iSubstitute + k][jSubstitute + l].setIndex(ind);
+                        tiles[iSubstitute + k][jSubstitute + l].setImage(
+                                ResourceLoader.loadImage("res/placeHolder.png"));
+                        tiles[iSubstitute + k][jSubstitute + l].repaint();
+                    } catch (IOException ex) {
+                        Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+
+            final int index = ind;
+            if(building instanceof Ride){}
+            else if(building instanceof Restaurant){}
+            final Building relevant = building;
+
+            Timer delay = new Timer(4000, new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent arg0) {
+                    final int index2 = index;
+                    for (int k = 0; k <= relevant.getDetails().height - 1; k++) {
+                        for (int l = 0; l <= relevant.getDetails().length - 1; l++) {
+                            try {
+                                tiles[iSubstitute + k][jSubstitute + l].setImage(
+                                        ResourceLoader.loadImage("res/" + buildings.get(index2).getDetails().image));
+                                tiles[iSubstitute + k][jSubstitute + l].repaint();
+                            } catch (IOException ex) {
+                                Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
+                }
+            });
+            delay.setRepeats(false);
+            delay.start();
+        }else{
+            for (int k = 0; k <= building.getDetails().height - 1; k++) {
+                for (int l = 0; l <= building.getDetails().length - 1; l++) {
+                    try {
+                        buildings.get(ind).getIndexes().add(new Point(iSubstitute + k, jSubstitute + l));
+                        modelTiles[iSubstitute + k][jSubstitute + l].setType(building.getName());
+                        modelTiles[iSubstitute + k][jSubstitute + l].setIndex(ind);
+                        tiles[iSubstitute + k][jSubstitute + l].setImage(
+                                ResourceLoader.loadImage("res/" + buildings.get(ind).getDetails().image));
+                        tiles[iSubstitute + k][jSubstitute + l].repaint();
+                    } catch (IOException ex) {
+                        Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }
@@ -450,6 +496,16 @@ public class GameEngine {
         workers.add(cleaner);
 
         getRandomRoad(cleaner);
+        System.out.print(workers.size());
+    }
+
+    public void fireCleaner() {
+        if (workers.size() > 0) {
+            tiles[workers.get(0).i][workers.get(0).j].remove(workers.get(0));
+            tiles[workers.get(0).i][workers.get(0).j].repaint();
+            workers.remove(0);
+        }
+        System.out.print(workers.size());
     }
 
     private void removeWorker(int id) {
