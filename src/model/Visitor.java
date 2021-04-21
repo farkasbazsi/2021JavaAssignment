@@ -1,5 +1,6 @@
 package model;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,9 +44,9 @@ public class Visitor extends JPanel {
     public int source;
     public int dest;
 
-    public Visitor(Details details, BufferedImage image) {
+    public Visitor(Details details/*, BufferedImage image*/) {
         this.details = details;
-        this.image = image;
+        //this.image = image;
         timer = new Timer(1000, new visitorTimer());
         timer.start();
         subTimer = new Timer(1000, new subTimer());
@@ -116,7 +117,7 @@ public class Visitor extends JPanel {
 
     private class visitorTimer implements ActionListener {
         /**
-         * Every 2 second visitors hunger increases by 1;
+         * Every second visitors hunger increases by 1;
          * @param arg0 
          */
         @Override
@@ -125,7 +126,7 @@ public class Visitor extends JPanel {
             if(hunger > 90) changeHappiness(-5);
             else if(hunger > 80) changeHappiness(-3);
             else if(hunger > 70) changeHappiness(-1);
-            
+            setBackground(happiness < 40 ? Color.RED : happiness > 70 ? Color.GREEN : Color.YELLOW);
         }
     }
 

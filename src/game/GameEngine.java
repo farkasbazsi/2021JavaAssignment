@@ -136,9 +136,10 @@ public class GameEngine {
      */
     private void newVisitor() throws IOException {
         Details dt = new Details("res/happy_man.png", 10, 10);
-        BufferedImage icon = (BufferedImage) ResourceLoader.loadImage("res/happy_man.png");
+        //BufferedImage icon = (BufferedImage) ResourceLoader.loadImage("res/happy_man.png");
 
-        Visitor visitor = new Visitor(dt, icon);
+        Visitor visitor = new Visitor(dt/*, icon*/);
+        visitor.setBackground(visitor.getHappiness() < 40 ? Color.RED : visitor.getHappiness() > 70 ? Color.GREEN : Color.YELLOW);
         tiles[22][12].add(visitor);
         visitors.add(visitor);
         t.start();
@@ -553,7 +554,9 @@ public class GameEngine {
             do {
                 visitor.randBuilding = buildings.get(rand.nextInt(buildings.size()));
             } while (visitor.randBuilding == null);
-        } while (visitor.randBuilding.getBUILDING_COST() < 60 || (visitor.prevBuild[0] == visitor.randBuilding.getIndexes().get(0).x
+        } while ((visitor.getHunger() < 70 ? visitor.randBuilding.getBUILDING_COST() == 155 : visitor.randBuilding.getBUILDING_COST() != 155)
+                || visitor.randBuilding.getBUILDING_COST() < 60
+                || (visitor.prevBuild[0] == visitor.randBuilding.getIndexes().get(0).x
                 && visitor.prevBuild[1] == visitor.randBuilding.getIndexes().get(0).y));
         visitor.prevBuild[0] = visitor.randBuilding.getIndexes().get(0).x;
         visitor.prevBuild[1] = visitor.randBuilding.getIndexes().get(0).y;
@@ -689,11 +692,13 @@ public class GameEngine {
                 }
 
                 if (visitor.source == visitor.dest) {
+                    if (visitor.getHunger() > 70) {
+                        visitor.eatSomething();
+                    }
                     visitor.pathIndex = 0;
                     visitor.posVis = 0;
                     visitor.arrived = true;
                     tiles[visitor.i][visitor.j].remove(visitor);
-                    //várni kellene egy kicsit maybe
                     tiles[visitor.i][visitor.j].repaint();
                     getRandomElement(visitor);
                     visitor.path.clear();
