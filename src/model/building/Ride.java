@@ -16,7 +16,11 @@ public class Ride extends Building{
         super(ride.getDetails(), ride.getBUILDING_COST(), ride.getName());
     }
       
-    private void changeState() {
-        currentState = BuildingState.BUILDING;
+    public void changeState(BuildingState state) {
+        currentState = state;
+    }
+
+    public BuildingState getCurrentState() {
+        return currentState;
     }
 }
