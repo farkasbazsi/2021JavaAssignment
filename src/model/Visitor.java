@@ -43,6 +43,8 @@ public class Visitor extends JPanel {
     public int j = 12;
     public int source;
     public int dest;
+    
+    public int tilesUntillTrash;
 
     public Visitor(Details details/*, BufferedImage image*/) {
         this.details = details;
@@ -54,6 +56,8 @@ public class Visitor extends JPanel {
         happiness = (int) ((Math.random() * (100 - 60)) + 60);
         money = (int) ((Math.random() * (1000 - 600)) + 600);
         hunger = (int) ((Math.random() * (30 - 0)) + 0);
+        
+        tilesUntillTrash = 0;
     }
 
     @Override

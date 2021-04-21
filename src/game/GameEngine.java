@@ -283,8 +283,6 @@ public class GameEngine {
             }
 
             final int index = ind;
-            if(building instanceof Ride){}
-            else if(building instanceof Restaurant){}
             final Building relevant = building;
 
             Timer delay = new Timer(4000, new ActionListener() {
@@ -306,7 +304,7 @@ public class GameEngine {
             });
             delay.setRepeats(false);
             delay.start();
-        }else{
+        } else {
             for (int k = 0; k <= building.getDetails().height - 1; k++) {
                 for (int l = 0; l <= building.getDetails().length - 1; l++) {
                     try {
@@ -704,12 +702,31 @@ public class GameEngine {
 
     /**
      * The visitors moved by this timer.
+     * Szélére ne építs utat!
      */
     private class visitorTimer implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
             for (Visitor visitor : visitors) {
+                if (visitor.tilesUntillTrash > 1 && "road".equals(modelTiles[visitor.i][visitor.j].getType())) {
+                    visitor.tilesUntillTrash = visitor.tilesUntillTrash - 1;
+                } else if (visitor.tilesUntillTrash == 1 && "road".equals(modelTiles[visitor.i][visitor.j].getType())) {
+                    if (!"trash_bin".equals(modelTiles[visitor.i+1][visitor.j].getType())||
+                        !"trash_bin".equals(modelTiles[visitor.i-1][visitor.j].getType())||
+                                !"trash_bin".equals(modelTiles[visitor.i][visitor.j+1].getType())||
+                                !"trash_bin".equals(modelTiles[visitor.i][visitor.j-1].getType())){
+                        Road temp = (Road) buildings.get(modelTiles[visitor.i][visitor.j].getIndex());
+                        temp.setTrashOnIt(true);
+                        buildings.set(modelTiles[visitor.i][visitor.j].getIndex(), temp);
+                        visitor.tilesUntillTrash = visitor.tilesUntillTrash - 1;
+                        try {
+                            tiles[visitor.i][visitor.j].setImage(ResourceLoader.loadImage("res/garbage.png"));
+                        } catch (IOException ex) {
+                            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
                 tiles[visitor.i][visitor.j].remove(visitor);
                 tiles[visitor.i][visitor.j].repaint();
 
@@ -760,6 +777,11 @@ public class GameEngine {
                     visitor.path.clear();
                     visitor.changeHappiness(10 - (10 * visitor.getHunger() / 100));
                     visitor.useRide(payment.getGamesFee());
+
+                    if ("buffet".equals(modelTiles[visitor.i][visitor.j].getType())
+                            || "restaurant".equals(modelTiles[visitor.i][visitor.j].getType())) {
+                        visitor.tilesUntillTrash = 5;
+                    }
                 } else {
                     tiles[visitor.i][visitor.j].add(visitor);
                     tiles[visitor.i][visitor.j].repaint();
