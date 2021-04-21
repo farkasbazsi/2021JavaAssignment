@@ -167,7 +167,7 @@ public class GameEngine {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            if (visitors.size() < 5) {
+            if (visitors.size() < 10) {
                 try {
                     newVisitor();
                 } catch (IOException ex) {
@@ -712,9 +712,9 @@ public class GameEngine {
                 if (visitor.tilesUntillTrash > 1 && "road".equals(modelTiles[visitor.i][visitor.j].getType())) {
                     visitor.tilesUntillTrash = visitor.tilesUntillTrash - 1;
                 } else if (visitor.tilesUntillTrash == 1 && "road".equals(modelTiles[visitor.i][visitor.j].getType())) {
-                    if (!"trash_bin".equals(modelTiles[visitor.i+1][visitor.j].getType())||
-                        !"trash_bin".equals(modelTiles[visitor.i-1][visitor.j].getType())||
-                                !"trash_bin".equals(modelTiles[visitor.i][visitor.j+1].getType())||
+                    if (!"trash_bin".equals(modelTiles[visitor.i+1][visitor.j].getType())&&
+                        !"trash_bin".equals(modelTiles[visitor.i-1][visitor.j].getType())&&
+                                !"trash_bin".equals(modelTiles[visitor.i][visitor.j+1].getType())&&
                                 !"trash_bin".equals(modelTiles[visitor.i][visitor.j-1].getType())){
                         Road temp = (Road) buildings.get(modelTiles[visitor.i][visitor.j].getIndex());
                         temp.setTrashOnIt(true);

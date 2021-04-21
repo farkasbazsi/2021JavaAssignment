@@ -45,6 +45,7 @@ public class Visitor extends JPanel {
     public int dest;
     
     public int tilesUntillTrash;
+    public boolean leaving;
 
     public Visitor(Details details/*, BufferedImage image*/) {
         this.details = details;
@@ -58,6 +59,7 @@ public class Visitor extends JPanel {
         hunger = (int) ((Math.random() * (30 - 0)) + 0);
         
         tilesUntillTrash = 0;
+        leaving = false;
     }
 
     @Override
@@ -127,9 +129,9 @@ public class Visitor extends JPanel {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             if(hunger <100) hunger++;
-            if(hunger > 90) changeHappiness(-5);
-            else if(hunger > 80) changeHappiness(-3);
-            else if(hunger > 70) changeHappiness(-1);
+            if(hunger > 70) changeHappiness(-5);
+            else if(hunger > 60) changeHappiness(-3);
+            else if(hunger > 50) changeHappiness(-1);
             setBackground(happiness < 40 ? Color.RED : happiness > 70 ? Color.GREEN : Color.YELLOW);
         }
     }
