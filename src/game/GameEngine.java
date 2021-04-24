@@ -701,21 +701,21 @@ public class GameEngine {
     }
 
     /**
-     * The visitors moved by this timer.
-     * Szélére ne építs utat!
+     * The visitors moved by this timer. Szélére ne építs utat!
      */
     private class visitorTimer implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
+            ArrayList<Visitor> found = new ArrayList<Visitor>();
             for (Visitor visitor : visitors) {
                 if (visitor.tilesUntillTrash > 1 && "road".equals(modelTiles[visitor.i][visitor.j].getType())) {
                     visitor.tilesUntillTrash = visitor.tilesUntillTrash - 1;
                 } else if (visitor.tilesUntillTrash == 1 && "road".equals(modelTiles[visitor.i][visitor.j].getType())) {
-                    if (!"trash_bin".equals(modelTiles[visitor.i+1][visitor.j].getType())&&
-                        !"trash_bin".equals(modelTiles[visitor.i-1][visitor.j].getType())&&
-                                !"trash_bin".equals(modelTiles[visitor.i][visitor.j+1].getType())&&
-                                !"trash_bin".equals(modelTiles[visitor.i][visitor.j-1].getType())){
+                    if (!"trash_bin".equals(modelTiles[visitor.i + 1][visitor.j].getType())
+                            && !"trash_bin".equals(modelTiles[visitor.i - 1][visitor.j].getType())
+                            && !"trash_bin".equals(modelTiles[visitor.i][visitor.j + 1].getType())
+                            && !"trash_bin".equals(modelTiles[visitor.i][visitor.j - 1].getType())) {
                         Road temp = (Road) buildings.get(modelTiles[visitor.i][visitor.j].getIndex());
                         temp.setTrashOnIt(true);
                         buildings.set(modelTiles[visitor.i][visitor.j].getIndex(), temp);
@@ -749,7 +749,13 @@ public class GameEngine {
 
                 if (buildingCoordinates[0] != 0 && visitor.arrived) {
                     //path.clear();
-                    visitor.printShortestDistance(graph, visitor.source, visitor.dest, v);
+                    if (visitor.getHappiness() < 35) {
+                        visitor.printShortestDistance(graph, visitor.source, 0, v);
+                        visitor.leaving = true;
+                    } else {
+                        visitor.printShortestDistance(graph, visitor.source, visitor.dest, v);
+                    }
+
                     //System.out.println(randBuilding.getName());
                     //System.out.println(graph);
                     //System.out.println(dest);
@@ -776,18 +782,24 @@ public class GameEngine {
                     getRandomElement(visitor);
                     visitor.path.clear();
                     visitor.changeHappiness(10 - (10 * visitor.getHunger() / 100));
-                    
-                    if(!freeGames.contains(modelTiles[visitor.i][visitor.j].getType())){
+
+                    if (!freeGames.contains(modelTiles[visitor.i][visitor.j].getType())) {
                         visitor.useRide(payment.getGamesFee());
                         money = money + payment.getGamesFee();
                     }
-                    
+
                     if ("buffet".equals(modelTiles[visitor.i][visitor.j].getType())
                             || "restaurant".equals(modelTiles[visitor.i][visitor.j].getType())) {
                         visitor.tilesUntillTrash = 5;
                     }
                 } else {
                     tiles[visitor.i][visitor.j].add(visitor);
+                    tiles[visitor.i][visitor.j].repaint();
+                }
+
+                if (visitor.leaving && visitor.source == 0) {
+                    found.add(visitor);
+                    tiles[visitor.i][visitor.j].remove(visitor);
                     tiles[visitor.i][visitor.j].repaint();
                 }
                 /*
@@ -797,7 +809,8 @@ public class GameEngine {
             }
                  */
             }
-
+            visitors.removeAll(found);
+            found.clear();
         }
 
     }
