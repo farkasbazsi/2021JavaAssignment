@@ -65,12 +65,16 @@ public class GameEngine {
     private boolean isOpen = false;
 
     int hmDeleteIndex;
-    Timer t = new Timer(700, new visitorTimer());
+    Timer t = new Timer(700, new visitorTimer());//1500 testing, 700 original
     Timer arrival = new Timer(5000, new arrivalTimer());
 
     private boolean edge = false;
 
     Timer wT = new Timer(600, new workerTimer());
+
+    int ii = -1;
+    int jj = -1;
+    int keresett = -1;
 
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
@@ -265,7 +269,7 @@ public class GameEngine {
             ind = buildings.size() - 1;
         }
 
-        if (building instanceof Restaurant || building instanceof Ride) {
+        if (building instanceof Restaurant || building instanceof Ride || building instanceof Toilet) {
 
             for (int k = 0; k <= building.getDetails().height - 1; k++) {
                 for (int l = 0; l <= building.getDetails().length - 1; l++) {
@@ -276,6 +280,21 @@ public class GameEngine {
                         tiles[iSubstitute + k][jSubstitute + l].setImage(
                                 ResourceLoader.loadImage("res/placeHolder.png"));
                         tiles[iSubstitute + k][jSubstitute + l].repaint();
+
+                        if (buildings.get(ind) instanceof Ride) {
+                            Ride ride = (Ride) buildings.get(ind);
+                            ride.changeState(BuildingState.BUILDING);
+                            buildings.set(ind, ride);
+                        } else if (buildings.get(ind) instanceof Restaurant) {
+                            Restaurant restaurant = (Restaurant) buildings.get(ind);
+                            restaurant.changeState(BuildingState.BUILDING);
+                            buildings.set(ind, restaurant);
+                        } else if (buildings.get(ind) instanceof Toilet) {
+                            Toilet toilet = (Toilet) buildings.get(ind);
+                            toilet.changeState(BuildingState.BUILDING);
+                            buildings.set(ind, toilet);
+                        }
+
                     } catch (IOException ex) {
                         Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -295,6 +314,21 @@ public class GameEngine {
                                 tiles[iSubstitute + k][jSubstitute + l].setImage(
                                         ResourceLoader.loadImage("res/" + buildings.get(index2).getDetails().image));
                                 tiles[iSubstitute + k][jSubstitute + l].repaint();
+
+                                if (buildings.get(index2) instanceof Ride) {
+                                    Ride ride = (Ride) buildings.get(index2);
+                                    ride.changeState(BuildingState.ACTIVE);
+                                    buildings.set(index2, ride);
+                                } else if (buildings.get(index2) instanceof Restaurant) {
+                                    Restaurant restaurant = (Restaurant) buildings.get(index2);
+                                    restaurant.changeState(BuildingState.ACTIVE);
+                                    buildings.set(index2, restaurant);
+                                } else if (buildings.get(index2) instanceof Toilet) {
+                                    Toilet toilet = (Toilet) buildings.get(index2);
+                                    toilet.changeState(BuildingState.ACTIVE);
+                                    buildings.set(index2, toilet);
+                                }
+
                             } catch (IOException ex) {
                                 Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
                             }
@@ -708,7 +742,12 @@ public class GameEngine {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             ArrayList<Visitor> found = new ArrayList<Visitor>();
+            ArrayList<Integer> activateInd = new ArrayList<Integer>();
             for (Visitor visitor : visitors) {
+                if (visitor.posVis == 0 && !"road".equals(modelTiles[visitor.i][visitor.j].getType())) {
+                    activateInd.add(modelTiles[visitor.i][visitor.j].getIndex());
+                }
+
                 if (visitor.tilesUntillTrash > 1 && "road".equals(modelTiles[visitor.i][visitor.j].getType())) {
                     visitor.tilesUntillTrash = visitor.tilesUntillTrash - 1;
                 } else if (visitor.tilesUntillTrash == 1 && "road".equals(modelTiles[visitor.i][visitor.j].getType())) {
@@ -763,10 +802,73 @@ public class GameEngine {
                 }
                 if (!visitor.arrived) {
                     if ((visitor.path.size() - 1 - visitor.pathIndex) >= 0) {
-                        visitor.posVis = visitor.path.get(visitor.path.size() - 1 - visitor.pathIndex);
-                        visitor.i = hm.get(visitor.posVis).get(0);
-                        visitor.j = hm.get(visitor.posVis).get(1);
-                        visitor.pathIndex++;
+                        int siVsop = visitor.path.get(visitor.path.size() - 1 - visitor.pathIndex);
+                        ii = hm.get(siVsop).get(0);
+                        jj = hm.get(siVsop).get(1);
+                        hm.forEach((k, Pvalue) -> {
+                            if (Pvalue.get(0).equals(ii) && Pvalue.get(1).equals(jj)) {
+                                keresett = k;
+                            }
+                        });
+                        if (keresett == visitor.dest) {
+                            if (buildings.get(modelTiles
+                                    [(int) visitor.randBuilding.getIndexes().get(0).getX()]
+                                    [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                                    .getIndex()) instanceof Ride) {
+                                Ride ride = (Ride) buildings.get(modelTiles
+                                        [(int) visitor.randBuilding.getIndexes().get(0).getX()]
+                                        [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                                        .getIndex());
+                                if (ride.getCurrentState() == BuildingState.ACTIVE) {
+                                    visitor.posVis = visitor.path.get(visitor.path.size() - 1 - visitor.pathIndex);
+                                    visitor.i = hm.get(visitor.posVis).get(0);
+                                    visitor.j = hm.get(visitor.posVis).get(1);
+                                    visitor.pathIndex++;
+
+                                    ride.changeState(BuildingState.IN_USE);
+                                    buildings.set(modelTiles[visitor.i][visitor.j].getIndex(), ride);
+                                }
+                            }else if (buildings.get(modelTiles
+                                    [(int) visitor.randBuilding.getIndexes().get(0).getX()]
+                                    [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                                    .getIndex()) instanceof Restaurant) {
+                                Restaurant restaurant = (Restaurant) buildings.get(modelTiles
+                                        [(int) visitor.randBuilding.getIndexes().get(0).getX()]
+                                        [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                                        .getIndex());
+                                if (restaurant.getCurrentState() == BuildingState.ACTIVE) {
+                                    visitor.posVis = visitor.path.get(visitor.path.size() - 1 - visitor.pathIndex);
+                                    visitor.i = hm.get(visitor.posVis).get(0);
+                                    visitor.j = hm.get(visitor.posVis).get(1);
+                                    visitor.pathIndex++;
+
+                                    restaurant.changeState(BuildingState.IN_USE);
+                                    buildings.set(modelTiles[visitor.i][visitor.j].getIndex(), restaurant);
+                                }
+                            }else if (buildings.get(modelTiles
+                                    [(int) visitor.randBuilding.getIndexes().get(0).getX()]
+                                    [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                                    .getIndex()) instanceof Toilet) {
+                                Toilet toilet = (Toilet) buildings.get(modelTiles
+                                        [(int) visitor.randBuilding.getIndexes().get(0).getX()]
+                                        [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                                        .getIndex());
+                                if (toilet.getCurrentState() == BuildingState.ACTIVE) {
+                                    visitor.posVis = visitor.path.get(visitor.path.size() - 1 - visitor.pathIndex);
+                                    visitor.i = hm.get(visitor.posVis).get(0);
+                                    visitor.j = hm.get(visitor.posVis).get(1);
+                                    visitor.pathIndex++;
+
+                                    toilet.changeState(BuildingState.IN_USE);
+                                    buildings.set(modelTiles[visitor.i][visitor.j].getIndex(), toilet);
+                                }
+                            }
+                        } else {
+                            visitor.posVis = visitor.path.get(visitor.path.size() - 1 - visitor.pathIndex);
+                            visitor.i = hm.get(visitor.posVis).get(0);
+                            visitor.j = hm.get(visitor.posVis).get(1);
+                            visitor.pathIndex++;
+                        }
                     }
                 }
 
@@ -802,15 +904,26 @@ public class GameEngine {
                     tiles[visitor.i][visitor.j].remove(visitor);
                     tiles[visitor.i][visitor.j].repaint();
                 }
-                /*
-            if (edge) {
-                getRandomElement();
-                edge = false;
-            }
-                 */
             }
             visitors.removeAll(found);
             found.clear();
+
+            for (Integer ind : activateInd) {
+                if (buildings.get(ind) instanceof Ride) {
+                    Ride ride = (Ride) buildings.get(ind);
+                    ride.changeState(BuildingState.ACTIVE);
+                    buildings.set(ind, ride);
+                } else if (buildings.get(ind) instanceof Restaurant) {
+                    Restaurant restaurant = (Restaurant) buildings.get(ind);
+                    restaurant.changeState(BuildingState.ACTIVE);
+                    buildings.set(ind, restaurant);
+                } else if (buildings.get(ind) instanceof Toilet) {
+                    Toilet toilet = (Toilet) buildings.get(ind);
+                    toilet.changeState(BuildingState.ACTIVE);
+                    buildings.set(ind, toilet);
+                }
+            }
+            activateInd.clear();
         }
 
     }

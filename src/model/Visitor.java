@@ -43,7 +43,7 @@ public class Visitor extends JPanel {
     public int j = 12;
     public int source;
     public int dest;
-    
+
     public int tilesUntillTrash;
     public boolean leaving;
 
@@ -57,7 +57,7 @@ public class Visitor extends JPanel {
         happiness = (int) ((Math.random() * (100 - 60)) + 60);
         money = (int) ((Math.random() * (1000 - 600)) + 600);
         hunger = (int) ((Math.random() * (30 - 0)) + 0);
-        
+
         tilesUntillTrash = 0;
         leaving = false;
     }
@@ -85,28 +85,32 @@ public class Visitor extends JPanel {
     }
 
     public void useRide(int price) {
-        if(money - price >= 0) money -= price;
-        else money = 0;
-    }
-    /**
-     * Changes the visitors happines by amount
-     * It can't go below 0 and above 100
-     * @param amount 
-     */
-    public void changeHappiness(int amount){
-        if(happiness + amount >= 100){
-            happiness = 100;
-        }else if(happiness + amount <= 0){
-            happiness = 0; // Tiszta én
-        }else{
-            happiness+=amount;
+        if (money - price >= 0) {
+            money -= price;
+        } else {
+            money = 0;
         }
     }
-    
-    public int getHunger(){
+
+    /**
+     * Changes the visitors happines by amount It can't go below 0 and above 100
+     *
+     * @param amount
+     */
+    public void changeHappiness(int amount) {
+        if (happiness + amount >= 100) {
+            happiness = 100;
+        } else if (happiness + amount <= 0) {
+            happiness = 0; // Tiszta én
+        } else {
+            happiness += amount;
+        }
+    }
+
+    public int getHunger() {
         return hunger;
     }
-    
+
     /**
      * If visitor eats something hunger changes to zero.
      */
@@ -115,23 +119,32 @@ public class Visitor extends JPanel {
     }
 
     private class subTimer implements ActionListener {
+
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            System.out.println("Money: "+money+" Happiness: "+happiness+" Hunger: "+hunger);
+            //System.out.println("Money: "+money+" Happiness: "+happiness+" Hunger: "+hunger);
         }
     }
 
     private class visitorTimer implements ActionListener {
+
         /**
          * Every second visitors hunger increases by 1;
-         * @param arg0 
+         *
+         * @param arg0
          */
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            if(hunger <100) hunger++;
-            if(hunger > 70) changeHappiness(-5);
-            else if(hunger > 60) changeHappiness(-3);
-            else if(hunger > 50) changeHappiness(-1);
+            if (hunger < 100) {
+                hunger++;
+            }
+            if (hunger > 70) {
+                changeHappiness(-5);
+            } else if (hunger > 60) {
+                changeHappiness(-3);
+            } else if (hunger > 50) {
+                changeHappiness(-1);
+            }
             setBackground(happiness < 40 ? Color.RED : happiness > 70 ? Color.GREEN : Color.YELLOW);
         }
     }
