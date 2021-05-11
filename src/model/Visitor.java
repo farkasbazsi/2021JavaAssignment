@@ -8,8 +8,11 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Random;
+import javax.accessibility.AccessibleContext;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import javax.swing.event.EventListenerList;
+import javax.swing.plaf.ComponentUI;
 import model.building.Building;
 
 /**
@@ -70,18 +73,6 @@ public class Visitor extends JPanel {
 
     public int getHappiness() {
         return happiness;
-    }
-
-    private void findPath() {
-
-    }
-
-    private void chooseGame() {
-
-    }
-
-    private void detectElements() {
-
     }
 
     public void useRide(int price) {
@@ -235,4 +226,174 @@ public class Visitor extends JPanel {
         }
         return false;
     }
+
+    public Details getDetails() {
+        return details;
+    }
+
+    public void setDetails(Details details) {
+        this.details = details;
+    }
+
+    public Timer getTimer() {
+        return timer;
+    }
+
+    public void setTimer(Timer timer) {
+        this.timer = timer;
+    }
+
+    public Timer getSubTimer() {
+        return subTimer;
+    }
+
+    public void setSubTimer(Timer subTimer) {
+        this.subTimer = subTimer;
+    }
+
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    public BufferedImage getImage() {
+        return image;
+    }
+
+    public void setImage(BufferedImage image) {
+        this.image = image;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public void setMoney(int money) {
+        this.money = money;
+    }
+
+    public LinkedList<Integer> getPath() {
+        return path;
+    }
+
+    public void setPath(LinkedList<Integer> path) {
+        this.path = path;
+    }
+
+    public boolean isArrived() {
+        return arrived;
+    }
+
+    public void setArrived(boolean arrived) {
+        this.arrived = arrived;
+    }
+
+    public int getPosVis() {
+        return posVis;
+    }
+
+    public void setPosVis(int posVis) {
+        this.posVis = posVis;
+    }
+
+    public int getPathIndex() {
+        return pathIndex;
+    }
+
+    public void setPathIndex(int pathIndex) {
+        this.pathIndex = pathIndex;
+    }
+
+    public Building getRandBuilding() {
+        return randBuilding;
+    }
+
+    public void setRandBuilding(Building randBuilding) {
+        this.randBuilding = randBuilding;
+    }
+
+    public int[] getPrevBuild() {
+        return prevBuild;
+    }
+
+    public void setPrevBuild(int[] prevBuild) {
+        this.prevBuild = prevBuild;
+    }
+
+    public int getI() {
+        return i;
+    }
+
+    public void setI(int i) {
+        this.i = i;
+    }
+
+    public int getJ() {
+        return j;
+    }
+
+    public void setJ(int j) {
+        this.j = j;
+    }
+
+    public int getSource() {
+        return source;
+    }
+
+    public void setSource(int source) {
+        this.source = source;
+    }
+
+    public int getDest() {
+        return dest;
+    }
+
+    public void setDest(int dest) {
+        this.dest = dest;
+    }
+
+    public int getTilesUntillTrash() {
+        return tilesUntillTrash;
+    }
+
+    public void setTilesUntillTrash(int tilesUntillTrash) {
+        this.tilesUntillTrash = tilesUntillTrash;
+    }
+
+    public boolean isLeaving() {
+        return leaving;
+    }
+
+    public void setLeaving(boolean leaving) {
+        this.leaving = leaving;
+    }
+
+    public ComponentUI getUi() {
+        return ui;
+    }
+
+    public void setUi(ComponentUI ui) {
+        this.ui = ui;
+    }
+
+    public EventListenerList getListenerList() {
+        return listenerList;
+    }
+
+    public void setListenerList(EventListenerList listenerList) {
+        this.listenerList = listenerList;
+    }
+
+    public AccessibleContext getAccessibleContext() {
+        return accessibleContext;
+    }
+
+    public void setAccessibleContext(AccessibleContext accessibleContext) {
+        this.accessibleContext = accessibleContext;
+    }
+    
+    
 }

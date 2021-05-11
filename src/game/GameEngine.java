@@ -66,10 +66,15 @@ public class GameEngine {
     private boolean isOpen = false;
 
     int hmDeleteIndex;
+<<<<<<< HEAD
     Timer t = new Timer(700, new visitorTimer());//1500 testing, 700 original
     Timer arrival = new Timer(5000, new arrivalTimer());
     Timer repair = new Timer(10000, new repairTimer());
     Timer mechanicT = new Timer(1000, new mechanicTimer());
+=======
+    Timer t = new Timer(300, new visitorTimer());//1500 slow testing, 700 original
+    Timer arrival = new Timer(2000, new arrivalTimer());//2000 fast testing, 5000 original
+>>>>>>> bae534de3752fb18a049aa50bfeea1ef9fb605de
 
     private boolean edge = false;
 
@@ -79,7 +84,11 @@ public class GameEngine {
     int jj = -1;
     int keresett = -1;
 
+<<<<<<< HEAD
     private ArrayList<Building> wrongBuildings = new ArrayList<>();
+=======
+    ArrayList<Integer> activateInd = new ArrayList<Integer>();
+>>>>>>> bae534de3752fb18a049aa50bfeea1ef9fb605de
 
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
@@ -178,7 +187,7 @@ public class GameEngine {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            if (visitors.size() < 10) {
+            if (visitors.size() < 15) {
                 try {
                     newVisitor();
                 } catch (IOException ex) {
@@ -576,7 +585,11 @@ public class GameEngine {
         tiles[22][12].add(cleaner);
         workers.add(cleaner);
 
-        getRandomRoad(cleaner);
+        try{
+            getRandomRoad(cleaner);
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
         System.out.print(workers.size());
     }
 
@@ -875,12 +888,8 @@ public class GameEngine {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             ArrayList<Visitor> found = new ArrayList<Visitor>();
-            ArrayList<Integer> activateInd = new ArrayList<Integer>();
+            ArrayList<Integer> toActivateInd = new ArrayList<Integer>();
             for (Visitor visitor : visitors) {
-                if (visitor.posVis == 0 && !"road".equals(modelTiles[visitor.i][visitor.j].getType())) {
-                    activateInd.add(modelTiles[visitor.i][visitor.j].getIndex());
-                }
-
                 if (visitor.tilesUntillTrash > 1 && "road".equals(modelTiles[visitor.i][visitor.j].getType())) {
                     visitor.tilesUntillTrash = visitor.tilesUntillTrash - 1;
                 } else if (visitor.tilesUntillTrash == 1 && "road".equals(modelTiles[visitor.i][visitor.j].getType())) {
@@ -954,7 +963,25 @@ public class GameEngine {
                                     visitor.j = hm.get(visitor.posVis).get(1);
                                     visitor.pathIndex++;
 
-                                    ride.changeState(BuildingState.IN_USE);
+                                    //ride.changeState(BuildingState.IN_USE);
+                                    ride.incCurrentVisitors();
+                                    //System.out.println("KIIR: " + ride.getTurnsTillStart());
+                                    if (ride.getCurrentVisitors() == ride.getMaxVisitors()) {
+                                        ride.changeState(BuildingState.IN_USE);
+                                        toActivateInd.add(modelTiles[visitor.i][visitor.j].getIndex());
+
+                                        hm.forEach((k, Pvalue) -> {
+                                            if (Pvalue.get(0).equals(visitor.i) && Pvalue.get(1).equals(visitor.j)) {
+                                                visitor.source = k;
+                                            }
+                                        });
+                                    } else {
+                                        hm.forEach((k, Pvalue) -> {
+                                            if (Pvalue.get(0).equals(visitor.i) && Pvalue.get(1).equals(visitor.j)) {
+                                                visitor.source = k;
+                                            }
+                                        });
+                                    }
                                     buildings.set(modelTiles[visitor.i][visitor.j].getIndex(), ride);
                                 }
                             } else if (buildings.get(modelTiles[(int) visitor.randBuilding.getIndexes().get(0).getX()][(int) visitor.randBuilding.getIndexes().get(0).getY()]
@@ -968,6 +995,8 @@ public class GameEngine {
                                     visitor.pathIndex++;
 
                                     restaurant.changeState(BuildingState.IN_USE);
+                                    toActivateInd.add(modelTiles[visitor.i][visitor.j].getIndex());
+
                                     buildings.set(modelTiles[visitor.i][visitor.j].getIndex(), restaurant);
                                 }
                             } else if (buildings.get(modelTiles[(int) visitor.randBuilding.getIndexes().get(0).getX()][(int) visitor.randBuilding.getIndexes().get(0).getY()]
@@ -981,6 +1010,8 @@ public class GameEngine {
                                     visitor.pathIndex++;
 
                                     toilet.changeState(BuildingState.IN_USE);
+                                    toActivateInd.add(modelTiles[visitor.i][visitor.j].getIndex());
+
                                     buildings.set(modelTiles[visitor.i][visitor.j].getIndex(), toilet);
                                 }
                             }
@@ -992,40 +1023,96 @@ public class GameEngine {
                         }
                     }
                 }
+            }
 
-                if (visitor.source == visitor.dest) {
-                    if (visitor.getHunger() > 70) {
-                        visitor.eatSomething();
+            for (int i = 0; i < buildings.size(); i++) {
+                if (buildings.get(i) instanceof Ride) {
+                    Ride ride = (Ride) buildings.get(i);
+                    if (ride.getCurrentVisitors() != 0
+                            && ride.getCurrentVisitors() != ride.getMaxVisitors()
+                            && ride.getTurnsTillStart() <= 0) {
+                        ride.changeState(BuildingState.IN_USE);
+                        toActivateInd.add(i);
+                        buildings.set(i, ride);
                     }
-                    visitor.pathIndex = 0;
-                    visitor.posVis = 0;
-                    visitor.arrived = true;
-                    tiles[visitor.i][visitor.j].remove(visitor);
-                    tiles[visitor.i][visitor.j].repaint();
-                    getRandomElement(visitor);
-                    visitor.path.clear();
-                    visitor.changeHappiness(10 - (10 * visitor.getHunger() / 100));
-
-                    if (!freeGames.contains(modelTiles[visitor.i][visitor.j].getType())) {
-                        visitor.useRide(payment.getGamesFee());
-                        money = money + payment.getGamesFee();
-                    }
-
-                    if ("buffet".equals(modelTiles[visitor.i][visitor.j].getType())
-                            || "restaurant".equals(modelTiles[visitor.i][visitor.j].getType())) {
-                        visitor.tilesUntillTrash = 5;
-                    }
-                } else {
-                    tiles[visitor.i][visitor.j].add(visitor);
-                    tiles[visitor.i][visitor.j].repaint();
-                }
-
-                if (visitor.leaving && visitor.source == 0) {
-                    found.add(visitor);
-                    tiles[visitor.i][visitor.j].remove(visitor);
-                    tiles[visitor.i][visitor.j].repaint();
                 }
             }
+
+            for (Visitor visitorAgain : visitors) {
+                if (buildings.get(modelTiles[(int) visitorAgain.randBuilding.getIndexes().get(0).getX()][(int) visitorAgain.randBuilding.getIndexes().get(0).getY()]
+                        .getIndex()) instanceof Ride) {
+                    Ride ride = (Ride) buildings.get(modelTiles[(int) visitorAgain.randBuilding.getIndexes().get(0).getX()][(int) visitorAgain.randBuilding.getIndexes().get(0).getY()]
+                            .getIndex());
+                    //System.out.println(visitorAgain.source + ", " + visitorAgain.dest + ", " + ride.getCurrentState());
+                    if (visitorAgain.source == visitorAgain.dest && ride.getCurrentState() == BuildingState.ACTIVE) {
+                        //System.out.println("Elotte: " + ride.getTurnsTillStart());
+                        ride.decTurnsTillStart();
+                        //System.out.println("Utana: " + ride.getTurnsTillStart());
+                        buildings.set(modelTiles[visitorAgain.i][visitorAgain.j].getIndex(), ride);
+                    }
+                    if (visitorAgain.source == visitorAgain.dest && ride.getCurrentState() == BuildingState.IN_USE) {
+                        //System.out.println("Tovabblepek");
+                        if (visitorAgain.getHunger() > 70) {
+                            visitorAgain.eatSomething();
+                        }
+                        visitorAgain.pathIndex = 0;
+                        visitorAgain.posVis = 0;
+                        visitorAgain.arrived = true;
+                        tiles[visitorAgain.i][visitorAgain.j].remove(visitorAgain);
+                        tiles[visitorAgain.i][visitorAgain.j].repaint();
+                        getRandomElement(visitorAgain);
+                        visitorAgain.path.clear();
+                        visitorAgain.changeHappiness(10 - (10 * visitorAgain.getHunger() / 100));
+
+                        if (!freeGames.contains(modelTiles[visitorAgain.i][visitorAgain.j].getType())) {
+                            visitorAgain.useRide(payment.getGamesFee());
+                            money = money + payment.getGamesFee();
+                        }
+
+                        if ("buffet".equals(modelTiles[visitorAgain.i][visitorAgain.j].getType())
+                                || "restaurant".equals(modelTiles[visitorAgain.i][visitorAgain.j].getType())) {
+                            visitorAgain.tilesUntillTrash = 5;
+                        }
+                    } else {
+                        tiles[visitorAgain.i][visitorAgain.j].add(visitorAgain);
+                        tiles[visitorAgain.i][visitorAgain.j].repaint();
+                    }
+                } else {
+                    if (visitorAgain.source == visitorAgain.dest) {
+                        if (visitorAgain.getHunger() > 70) {
+                            visitorAgain.eatSomething();
+                        }
+                        visitorAgain.pathIndex = 0;
+                        visitorAgain.posVis = 0;
+                        visitorAgain.arrived = true;
+                        tiles[visitorAgain.i][visitorAgain.j].remove(visitorAgain);
+                        tiles[visitorAgain.i][visitorAgain.j].repaint();
+                        getRandomElement(visitorAgain);
+                        visitorAgain.path.clear();
+                        visitorAgain.changeHappiness(10 - (10 * visitorAgain.getHunger() / 100));
+
+                        if (!freeGames.contains(modelTiles[visitorAgain.i][visitorAgain.j].getType())) {
+                            visitorAgain.useRide(payment.getGamesFee());
+                            money = money + payment.getGamesFee();
+                        }
+
+                        if ("buffet".equals(modelTiles[visitorAgain.i][visitorAgain.j].getType())
+                                || "restaurant".equals(modelTiles[visitorAgain.i][visitorAgain.j].getType())) {
+                            visitorAgain.tilesUntillTrash = 5;
+                        }
+                    } else {
+                        tiles[visitorAgain.i][visitorAgain.j].add(visitorAgain);
+                        tiles[visitorAgain.i][visitorAgain.j].repaint();
+                    }
+                }
+
+                if (visitorAgain.leaving && visitorAgain.source == 0) {
+                    found.add(visitorAgain);
+                    tiles[visitorAgain.i][visitorAgain.j].remove(visitorAgain);
+                    tiles[visitorAgain.i][visitorAgain.j].repaint();
+                }
+            }
+
             visitors.removeAll(found);
             found.clear();
 
@@ -1033,7 +1120,10 @@ public class GameEngine {
                 if (buildings.get(ind) instanceof Ride) {
                     Ride ride = (Ride) buildings.get(ind);
                     ride.changeState(BuildingState.ACTIVE);
+                    ride.setCurrentVisitors(0);
+                    ride.setTurnsTillStart(5);
                     buildings.set(ind, ride);
+                    //System.out.println(ride.getCurrentState());
                 } else if (buildings.get(ind) instanceof Restaurant) {
                     Restaurant restaurant = (Restaurant) buildings.get(ind);
                     restaurant.changeState(BuildingState.ACTIVE);
@@ -1045,6 +1135,11 @@ public class GameEngine {
                 }
             }
             activateInd.clear();
+            //System.out.println("HOSSZ: " + toActivateInd.size());
+            for (Integer ind : toActivateInd) {
+                activateInd.add(ind);
+            }
+            toActivateInd.clear();
         }
 
     }
@@ -1229,4 +1324,174 @@ public class GameEngine {
         adj.get(j).add(i);
     }
 
+    public Timer getTimer() {
+        return timer;
+    }
+
+    public void setTimer(Timer timer) {
+        this.timer = timer;
+    }
+
+    public ArrayList<Worker> getWorkers() {
+        return workers;
+    }
+
+    public void setWorkers(ArrayList<Worker> workers) {
+        this.workers = workers;
+    }
+
+    public ArrayList<Building> getBuildings() {
+        return buildings;
+    }
+
+    public void setBuildings(ArrayList<Building> buildings) {
+        this.buildings = buildings;
+    }
+
+    public ArrayList<Visitor> getVisitors() {
+        return visitors;
+    }
+
+    public void setVisitors(ArrayList<Visitor> visitors) {
+        this.visitors = visitors;
+    }
+
+    public ModelTile[][] getModelTiles() {
+        return modelTiles;
+    }
+
+    public void setModelTiles(ModelTile[][] modelTiles) {
+        this.modelTiles = modelTiles;
+    }
+
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    public void setTiles(Tile[][] tiles) {
+        this.tiles = tiles;
+    }
+
+    public Hashtable<Integer, ArrayList<Integer>> getHm() {
+        return hm;
+    }
+
+    public void setHm(Hashtable<Integer, ArrayList<Integer>> hm) {
+        this.hm = hm;
+    }
+
+    public int getV() {
+        return v;
+    }
+
+    public void setV(int v) {
+        this.v = v;
+    }
+
+    public ArrayList<ArrayList<Integer>> getGraph() {
+        return graph;
+    }
+
+    public void setGraph(ArrayList<ArrayList<Integer>> graph) {
+        this.graph = graph;
+    }
+
+    public int getParentRoadKey() {
+        return parentRoadKey;
+    }
+
+    public void setParentRoadKey(int parentRoadKey) {
+        this.parentRoadKey = parentRoadKey;
+    }
+
+    public int getParentRoadI() {
+        return parentRoadI;
+    }
+
+    public void setParentRoadI(int parentRoadI) {
+        this.parentRoadI = parentRoadI;
+    }
+
+    public int getParentRoadJ() {
+        return parentRoadJ;
+    }
+
+    public void setParentRoadJ(int parentRoadJ) {
+        this.parentRoadJ = parentRoadJ;
+    }
+
+    public boolean isIsOpen() {
+        return isOpen;
+    }
+
+    public void setIsOpen(boolean isOpen) {
+        this.isOpen = isOpen;
+    }
+
+    public int getHmDeleteIndex() {
+        return hmDeleteIndex;
+    }
+
+    public void setHmDeleteIndex(int hmDeleteIndex) {
+        this.hmDeleteIndex = hmDeleteIndex;
+    }
+
+    public Timer getT() {
+        return t;
+    }
+
+    public void setT(Timer t) {
+        this.t = t;
+    }
+
+    public Timer getArrival() {
+        return arrival;
+    }
+
+    public void setArrival(Timer arrival) {
+        this.arrival = arrival;
+    }
+
+    public boolean isEdge() {
+        return edge;
+    }
+
+    public void setEdge(boolean edge) {
+        this.edge = edge;
+    }
+
+    public Timer getwT() {
+        return wT;
+    }
+
+    public void setwT(Timer wT) {
+        this.wT = wT;
+    }
+
+    public int getIi() {
+        return ii;
+    }
+
+    public void setIi(int ii) {
+        this.ii = ii;
+    }
+
+    public int getJj() {
+        return jj;
+    }
+
+    public void setJj(int jj) {
+        this.jj = jj;
+    }
+
+    public int getKeresett() {
+        return keresett;
+    }
+
+    public void setKeresett(int keresett) {
+        this.keresett = keresett;
+    }
+
+    
+    
 }
