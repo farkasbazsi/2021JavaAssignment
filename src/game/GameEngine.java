@@ -863,39 +863,40 @@ public class GameEngine {
                     }
 
                     if (worker.source == worker.dest) {
+                        worker.pathIndex = 0;
+                        worker.posVis = 0;
+                        worker.arrived = true;
+                        //tiles[worker.i][worker.j].remove(worker);
+                        //várni kellene egy kicsit maybe
+                        tiles[worker.i][worker.j].add(worker);
+                        tiles[worker.i][worker.j].repaint();
+                        getRandomBuild(worker);
+                        worker.path.clear();
+                        //visitor.changeHappiness(10-(10*visitor.getHunger()/100));
+                        //visitor.useRide(payment.getGamesFee());
+                        if (buildings.get(modelTiles[worker.i][worker.j].getIndex()) instanceof Ride) {
+                            Timer delay = new Timer(1000, new ActionListener() {
+                                @Override
+                                public void actionPerformed(ActionEvent arg0) {
 
-                        Timer delay = new Timer(4000, new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent arg0) {
-                                /*
-                                Ride ri = (Ride) buildings.get(modelTiles[worker.i][worker.j].getIndex());
-                                ri.changeState(BuildingState.ACTIVE);
-                                buildings.set(modelTiles[worker.i][worker.j].getIndex(), ri);
+                                    Ride ri = (Ride) buildings.get(modelTiles[worker.i][worker.j].getIndex());
+                                    ri.changeState(BuildingState.ACTIVE);
+                                    buildings.set(modelTiles[worker.i][worker.j].getIndex(), ri);
 
-                                for (Point p : ri.getIndexes()) {
-                                    try {
-                                        tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/" + ri.getDetails().image));
-                                        tiles[p.x][p.y].repaint();
-                                    } catch (IOException ex) {
-                                        Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                                    for (Point p : ri.getIndexes()) {
+                                        try {
+                                            tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/" + ri.getDetails().image));
+                                            tiles[p.x][p.y].repaint();
+                                        } catch (IOException ex) {
+                                            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                                        }
                                     }
+
                                 }
-*/
-                                worker.pathIndex = 0;
-                                worker.posVis = 0;
-                                worker.arrived = true;
-                                //tiles[worker.i][worker.j].remove(worker);
-                                //várni kellene egy kicsit maybe
-                                tiles[worker.i][worker.j].add(worker);
-                                tiles[worker.i][worker.j].repaint();
-                                getRandomBuild(worker);
-                                worker.path.clear();
-                                //visitor.changeHappiness(10-(10*visitor.getHunger()/100));
-                                //visitor.useRide(payment.getGamesFee());
-                            }
-                        });
-                        delay.setRepeats(false);
-                        delay.start();
+                            });
+                            delay.setRepeats(false);
+                            delay.start();
+                        }
 
                     } else {
                         tiles[worker.i][worker.j].add(worker);
@@ -1149,7 +1150,7 @@ public class GameEngine {
                     Ride ride = (Ride) buildings.get(ind);
                     Random rand = new Random();
                     int rand_int = rand.nextInt(100);
-                    if (rand_int > 20) {
+                    if (rand_int > 30) {
                         ride.changeState(BuildingState.NEED_TO_REPAIR);
                         for (Point p : ride.getIndexes()) {
                             try {
