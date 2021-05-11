@@ -66,15 +66,11 @@ public class GameEngine {
     private boolean isOpen = false;
 
     int hmDeleteIndex;
-<<<<<<< HEAD
+
     Timer t = new Timer(700, new visitorTimer());//1500 testing, 700 original
     Timer arrival = new Timer(5000, new arrivalTimer());
     Timer repair = new Timer(10000, new repairTimer());
-    Timer mechanicT = new Timer(1000, new mechanicTimer());
-=======
-    Timer t = new Timer(300, new visitorTimer());//1500 slow testing, 700 original
-    Timer arrival = new Timer(2000, new arrivalTimer());//2000 fast testing, 5000 original
->>>>>>> bae534de3752fb18a049aa50bfeea1ef9fb605de
+    //Timer mechanicT = new Timer(100, new mechanicTimer());
 
     private boolean edge = false;
 
@@ -84,11 +80,9 @@ public class GameEngine {
     int jj = -1;
     int keresett = -1;
 
-<<<<<<< HEAD
     private ArrayList<Building> wrongBuildings = new ArrayList<>();
-=======
+
     ArrayList<Integer> activateInd = new ArrayList<Integer>();
->>>>>>> bae534de3752fb18a049aa50bfeea1ef9fb605de
 
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
@@ -148,7 +142,7 @@ public class GameEngine {
         isOpen = true;
         newVisitor();
         repair.start();
-        mechanicT.start();
+        //mechanicT.start();
     }
 
     /**
@@ -187,7 +181,7 @@ public class GameEngine {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            if (visitors.size() < 15) {
+            if (visitors.size() < 5) {
                 try {
                     newVisitor();
                 } catch (IOException ex) {
@@ -383,14 +377,23 @@ public class GameEngine {
         System.out.print(workers.size());
     }
 
+    /*
     private class mechanicTimer implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-
+            for(Building build : buildings) {
+                for(Point p : build.getIndexes()) {
+                    try {
+                        tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/construction.png"));
+                    } catch (IOException ex) {
+                        Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
         }
     }
-
+     */
     private class repairTimer implements ActionListener {
 
         @Override
@@ -585,9 +588,9 @@ public class GameEngine {
         tiles[22][12].add(cleaner);
         workers.add(cleaner);
 
-        try{
+        try {
             getRandomRoad(cleaner);
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         System.out.print(workers.size());
@@ -702,23 +705,25 @@ public class GameEngine {
     }
 
     private void getRandomBuild(Worker worker) {
-        System.out.println(wrongBuildings.size());
-        if (wrongBuildings.size() > 0) {
-            Random rand = new Random();
-            do {
-                do {
-                    worker.randBuilding = wrongBuildings.get(rand.nextInt(wrongBuildings.size()));
-                } while (worker.randBuilding == null);
-            } while (worker.randBuilding.getBUILDING_COST() < 61);
-            wrongBuildings.remove(worker.randBuilding);
-            System.out.println("javít");
-        } else {
+        for (Building build : buildings) {
+            if (build instanceof Ride) {
+                Ride ride = (Ride) build;
+                if (ride.getCurrentState().equals(BuildingState.NEED_TO_REPAIR)) {
+                    ride.changeState(BuildingState.REPAIRING);
+                    worker.randBuilding = ride;
+                }
+            }
+        }
+        if (worker.randBuilding == null) {
             Random rand = new Random();
             do {
                 do {
                     worker.randBuilding = buildings.get(rand.nextInt(buildings.size()));
                 } while (worker.randBuilding == null);
-            } while (worker.randBuilding.getBUILDING_COST() < 61);
+            } while (!(worker.randBuilding instanceof Road) || (worker.prevBuild[0] == worker.randBuilding.getIndexes().get(0).x
+                    && worker.prevBuild[1] == worker.randBuilding.getIndexes().get(0).y));
+            worker.prevBuild[0] = worker.randBuilding.getIndexes().get(0).x;
+            worker.prevBuild[1] = worker.randBuilding.getIndexes().get(0).y;
         }
     }
 
@@ -858,17 +863,40 @@ public class GameEngine {
                     }
 
                     if (worker.source == worker.dest) {
-                        worker.pathIndex = 0;
-                        worker.posVis = 0;
-                        worker.arrived = true;
-                        //tiles[worker.i][worker.j].remove(worker);
-                        //várni kellene egy kicsit maybe
-                        tiles[worker.i][worker.j].add(worker);
-                        tiles[worker.i][worker.j].repaint();
-                        getRandomBuild(worker);
-                        worker.path.clear();
-                        //visitor.changeHappiness(10-(10*visitor.getHunger()/100));
-                        //visitor.useRide(payment.getGamesFee());
+
+                        Timer delay = new Timer(4000, new ActionListener() {
+                            @Override
+                            public void actionPerformed(ActionEvent arg0) {
+                                /*
+                                Ride ri = (Ride) buildings.get(modelTiles[worker.i][worker.j].getIndex());
+                                ri.changeState(BuildingState.ACTIVE);
+                                buildings.set(modelTiles[worker.i][worker.j].getIndex(), ri);
+
+                                for (Point p : ri.getIndexes()) {
+                                    try {
+                                        tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/" + ri.getDetails().image));
+                                        tiles[p.x][p.y].repaint();
+                                    } catch (IOException ex) {
+                                        Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                                    }
+                                }
+*/
+                                worker.pathIndex = 0;
+                                worker.posVis = 0;
+                                worker.arrived = true;
+                                //tiles[worker.i][worker.j].remove(worker);
+                                //várni kellene egy kicsit maybe
+                                tiles[worker.i][worker.j].add(worker);
+                                tiles[worker.i][worker.j].repaint();
+                                getRandomBuild(worker);
+                                worker.path.clear();
+                                //visitor.changeHappiness(10-(10*visitor.getHunger()/100));
+                                //visitor.useRide(payment.getGamesFee());
+                            }
+                        });
+                        delay.setRepeats(false);
+                        delay.start();
+
                     } else {
                         tiles[worker.i][worker.j].add(worker);
                         tiles[worker.i][worker.j].repaint();
@@ -1119,9 +1147,23 @@ public class GameEngine {
             for (Integer ind : activateInd) {
                 if (buildings.get(ind) instanceof Ride) {
                     Ride ride = (Ride) buildings.get(ind);
-                    ride.changeState(BuildingState.ACTIVE);
+                    Random rand = new Random();
+                    int rand_int = rand.nextInt(100);
+                    if (rand_int > 20) {
+                        ride.changeState(BuildingState.NEED_TO_REPAIR);
+                        for (Point p : ride.getIndexes()) {
+                            try {
+                                tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/construction.png"));
+                                tiles[p.x][p.y].repaint();
+                            } catch (IOException ex) {
+                                Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    } else {
+                        ride.changeState(BuildingState.ACTIVE);
+                    }
                     ride.setCurrentVisitors(0);
-                    ride.setTurnsTillStart(5);
+                    ride.setTurnsTillStart(10);
                     buildings.set(ind, ride);
                     //System.out.println(ride.getCurrentState());
                 } else if (buildings.get(ind) instanceof Restaurant) {
@@ -1492,6 +1534,4 @@ public class GameEngine {
         this.keresett = keresett;
     }
 
-    
-    
 }
