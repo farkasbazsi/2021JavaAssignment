@@ -530,7 +530,11 @@ public class GameEngine {
         tiles[22][12].add(cleaner);
         workers.add(cleaner);
 
-        getRandomRoad(cleaner);
+        try{
+            getRandomRoad(cleaner);
+        }catch(Exception e){
+            System.out.println(e.getMessage());
+        }
         System.out.print(workers.size());
     }
 
@@ -1180,4 +1184,174 @@ public class GameEngine {
         adj.get(j).add(i);
     }
 
+    public Timer getTimer() {
+        return timer;
+    }
+
+    public void setTimer(Timer timer) {
+        this.timer = timer;
+    }
+
+    public ArrayList<Worker> getWorkers() {
+        return workers;
+    }
+
+    public void setWorkers(ArrayList<Worker> workers) {
+        this.workers = workers;
+    }
+
+    public ArrayList<Building> getBuildings() {
+        return buildings;
+    }
+
+    public void setBuildings(ArrayList<Building> buildings) {
+        this.buildings = buildings;
+    }
+
+    public ArrayList<Visitor> getVisitors() {
+        return visitors;
+    }
+
+    public void setVisitors(ArrayList<Visitor> visitors) {
+        this.visitors = visitors;
+    }
+
+    public ModelTile[][] getModelTiles() {
+        return modelTiles;
+    }
+
+    public void setModelTiles(ModelTile[][] modelTiles) {
+        this.modelTiles = modelTiles;
+    }
+
+    public Tile[][] getTiles() {
+        return tiles;
+    }
+
+    public void setTiles(Tile[][] tiles) {
+        this.tiles = tiles;
+    }
+
+    public Hashtable<Integer, ArrayList<Integer>> getHm() {
+        return hm;
+    }
+
+    public void setHm(Hashtable<Integer, ArrayList<Integer>> hm) {
+        this.hm = hm;
+    }
+
+    public int getV() {
+        return v;
+    }
+
+    public void setV(int v) {
+        this.v = v;
+    }
+
+    public ArrayList<ArrayList<Integer>> getGraph() {
+        return graph;
+    }
+
+    public void setGraph(ArrayList<ArrayList<Integer>> graph) {
+        this.graph = graph;
+    }
+
+    public int getParentRoadKey() {
+        return parentRoadKey;
+    }
+
+    public void setParentRoadKey(int parentRoadKey) {
+        this.parentRoadKey = parentRoadKey;
+    }
+
+    public int getParentRoadI() {
+        return parentRoadI;
+    }
+
+    public void setParentRoadI(int parentRoadI) {
+        this.parentRoadI = parentRoadI;
+    }
+
+    public int getParentRoadJ() {
+        return parentRoadJ;
+    }
+
+    public void setParentRoadJ(int parentRoadJ) {
+        this.parentRoadJ = parentRoadJ;
+    }
+
+    public boolean isIsOpen() {
+        return isOpen;
+    }
+
+    public void setIsOpen(boolean isOpen) {
+        this.isOpen = isOpen;
+    }
+
+    public int getHmDeleteIndex() {
+        return hmDeleteIndex;
+    }
+
+    public void setHmDeleteIndex(int hmDeleteIndex) {
+        this.hmDeleteIndex = hmDeleteIndex;
+    }
+
+    public Timer getT() {
+        return t;
+    }
+
+    public void setT(Timer t) {
+        this.t = t;
+    }
+
+    public Timer getArrival() {
+        return arrival;
+    }
+
+    public void setArrival(Timer arrival) {
+        this.arrival = arrival;
+    }
+
+    public boolean isEdge() {
+        return edge;
+    }
+
+    public void setEdge(boolean edge) {
+        this.edge = edge;
+    }
+
+    public Timer getwT() {
+        return wT;
+    }
+
+    public void setwT(Timer wT) {
+        this.wT = wT;
+    }
+
+    public int getIi() {
+        return ii;
+    }
+
+    public void setIi(int ii) {
+        this.ii = ii;
+    }
+
+    public int getJj() {
+        return jj;
+    }
+
+    public void setJj(int jj) {
+        this.jj = jj;
+    }
+
+    public int getKeresett() {
+        return keresett;
+    }
+
+    public void setKeresett(int keresett) {
+        this.keresett = keresett;
+    }
+
+    
+    
 }
