@@ -25,6 +25,7 @@ import model.Payment;
 import model.Tile;
 import model.worker.Worker;
 import model.worker.Cleaner;
+import model.worker.Mechanic;
 import model.building.Building;
 import model.Visitor;
 import model.building.BuildingState;
@@ -67,6 +68,8 @@ public class GameEngine {
     int hmDeleteIndex;
     Timer t = new Timer(700, new visitorTimer());//1500 testing, 700 original
     Timer arrival = new Timer(5000, new arrivalTimer());
+    Timer repair = new Timer(10000, new repairTimer());
+    Timer mechanicT = new Timer(1000, new mechanicTimer());
 
     private boolean edge = false;
 
@@ -75,6 +78,8 @@ public class GameEngine {
     int ii = -1;
     int jj = -1;
     int keresett = -1;
+
+    private ArrayList<Building> wrongBuildings = new ArrayList<>();
 
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
@@ -133,6 +138,8 @@ public class GameEngine {
     public void openPark() throws IOException {
         isOpen = true;
         newVisitor();
+        repair.start();
+        mechanicT.start();
     }
 
     /**
@@ -356,6 +363,47 @@ public class GameEngine {
         }
     }
 
+    public void newMechanic() throws IOException {
+        Details dt = new Details("res/mechanic.png", 10, 10);
+        BufferedImage icon = (BufferedImage) ResourceLoader.loadImage(dt.image);
+        Mechanic mc = new Mechanic(dt, icon);
+        tiles[22][12].add(mc);
+        workers.add(mc);
+
+        getRandomBuild(mc);
+        System.out.print(workers.size());
+    }
+
+    private class mechanicTimer implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+
+        }
+    }
+
+    private class repairTimer implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            getRepairingBuilding();
+        }
+    }
+
+    /**
+     * Give back a random building from buildings arraylist.
+     *
+     * @param visitor
+     */
+    private void getRepairingBuilding() {
+        Random rand = new Random();
+        Building randBuild;
+        do {
+            randBuild = buildings.get(rand.nextInt(buildings.size()));
+        } while (randBuild.getBUILDING_COST() < 60);
+        wrongBuildings.add(randBuild);
+    }
+
     /**
      * When the player builds one tile road, this function insert a new node to
      * the graph. The new node represents the road with a hashtable.
@@ -541,6 +589,15 @@ public class GameEngine {
         System.out.print(workers.size());
     }
 
+    public void fireMechanic() {
+        if (workers.size() > 1) {
+            tiles[workers.get(1).i][workers.get(1).j].remove(workers.get(1));
+            tiles[workers.get(1).i][workers.get(1).j].repaint();
+            workers.remove(1);
+        }
+        System.out.print(workers.size());
+    }
+
     private void removeWorker(int id) {
 
     }
@@ -631,6 +688,27 @@ public class GameEngine {
         worker.prevBuild[1] = worker.randBuilding.getIndexes().get(0).y;
     }
 
+    private void getRandomBuild(Worker worker) {
+        System.out.println(wrongBuildings.size());
+        if (wrongBuildings.size() > 0) {
+            Random rand = new Random();
+            do {
+                do {
+                    worker.randBuilding = wrongBuildings.get(rand.nextInt(wrongBuildings.size()));
+                } while (worker.randBuilding == null);
+            } while (worker.randBuilding.getBUILDING_COST() < 61);
+            wrongBuildings.remove(worker.randBuilding);
+            System.out.println("javít");
+        } else {
+            Random rand = new Random();
+            do {
+                do {
+                    worker.randBuilding = buildings.get(rand.nextInt(buildings.size()));
+                } while (worker.randBuilding == null);
+            } while (worker.randBuilding.getBUILDING_COST() < 61);
+        }
+    }
+
     /**
      * Give back a random building from buildings arraylist.
      *
@@ -659,76 +737,131 @@ public class GameEngine {
         public void actionPerformed(ActionEvent arg0) {
             for (Worker worker : workers) {
                 //System.out.printf(worker.randBuilding.toString());
-
-                Road i = (Road) buildings.get(modelTiles[worker.i][worker.j].getIndex());
-                boolean x = i.hasTrashOnIt();
-                if (x) {
-                    //buildings.get(modelTiles[worker.i][worker.j].getIndex()).setTrashOnIt(false);
-                    i.setTrashOnIt(false);
-                    try {
-                        //Image image = new Image(ResourceLoader.loadImage("res/grass.png"));
-                        tiles[worker.i][worker.j].setImage(ResourceLoader.loadImage("res/road.png"));
-                    } catch (IOException ex) {
-                        Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                if (worker instanceof Cleaner) {
+                    Road i = (Road) buildings.get(modelTiles[worker.i][worker.j].getIndex());
+                    boolean x = i.hasTrashOnIt();
+                    if (x) {
+                        //buildings.get(modelTiles[worker.i][worker.j].getIndex()).setTrashOnIt(false);
+                        i.setTrashOnIt(false);
+                        try {
+                            //Image image = new Image(ResourceLoader.loadImage("res/grass.png"));
+                            tiles[worker.i][worker.j].setImage(ResourceLoader.loadImage("res/road.png"));
+                        } catch (IOException ex) {
+                            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     }
-                }
 
-                tiles[worker.i][worker.j].remove(worker);
-                tiles[worker.i][worker.j].repaint();
+                    tiles[worker.i][worker.j].remove(worker);
+                    tiles[worker.i][worker.j].repaint();
 
-                int[] buildingCoordinates = new int[2];
-                buildingCoordinates[0] = (int) worker.randBuilding.getIndexes().get(0).getX();
-                buildingCoordinates[1] = (int) worker.randBuilding.getIndexes().get(0).getY();
-                //(int)worker.randBuilding.getIndexes().get(0).getY()]; //findBuilding(modelTiles, visitor.randBuilding, visitor.randBuilding.getDetails().height, visitor.randBuilding.getDetails().length);
-                //System.out.println(buildingCoordinates[0] + " " + buildingCoordinates[1]);
-                //System.out.println(graph);
-                //System.out.println(randBuilding.getName());
-
-                hm.forEach((k, Pvalue) -> {
-                    if (Pvalue.get(0).equals(worker.i) && Pvalue.get(1).equals(worker.j)) {
-                        worker.source = k;
-                    }
-                });
-
-                hm.forEach((k, Pvalue) -> {
-                    if (Pvalue.get(0).equals(buildingCoordinates[0]) && Pvalue.get(1).equals(buildingCoordinates[1])) {
-                        worker.dest = k;
-                    }
-                });
-
-                if (buildingCoordinates[0] != 0 && worker.arrived) {
-                    //path.clear();
-                    worker.printShortestDistance(graph, worker.source, worker.dest, v);
-                    //System.out.println(randBuilding.getName());
+                    int[] buildingCoordinates = new int[2];
+                    buildingCoordinates[0] = (int) worker.randBuilding.getIndexes().get(0).getX();
+                    buildingCoordinates[1] = (int) worker.randBuilding.getIndexes().get(0).getY();
+                    //(int)worker.randBuilding.getIndexes().get(0).getY()]; //findBuilding(modelTiles, visitor.randBuilding, visitor.randBuilding.getDetails().height, visitor.randBuilding.getDetails().length);
+                    //System.out.println(buildingCoordinates[0] + " " + buildingCoordinates[1]);
                     //System.out.println(graph);
-                    //System.out.println(dest);
-                    worker.arrived = false;
-                }
-                if (!worker.arrived) {
-                    if ((worker.path.size() - 1 - worker.pathIndex) >= 0) {
-                        worker.posVis = worker.path.get(worker.path.size() - 1 - worker.pathIndex);
-                        worker.i = hm.get(worker.posVis).get(0);
-                        worker.j = hm.get(worker.posVis).get(1);
-                        worker.pathIndex++;
+                    //System.out.println(randBuilding.getName());
+
+                    hm.forEach((k, Pvalue) -> {
+                        if (Pvalue.get(0).equals(worker.i) && Pvalue.get(1).equals(worker.j)) {
+                            worker.source = k;
+                        }
+                    });
+
+                    hm.forEach((k, Pvalue) -> {
+                        if (Pvalue.get(0).equals(buildingCoordinates[0]) && Pvalue.get(1).equals(buildingCoordinates[1])) {
+                            worker.dest = k;
+                        }
+                    });
+
+                    if (buildingCoordinates[0] != 0 && worker.arrived) {
+                        //path.clear();
+                        worker.printShortestDistance(graph, worker.source, worker.dest, v);
+                        //System.out.println(randBuilding.getName());
+                        //System.out.println(graph);
+                        //System.out.println(dest);
+                        worker.arrived = false;
+                    }
+                    if (!worker.arrived) {
+                        if ((worker.path.size() - 1 - worker.pathIndex) >= 0) {
+                            worker.posVis = worker.path.get(worker.path.size() - 1 - worker.pathIndex);
+                            worker.i = hm.get(worker.posVis).get(0);
+                            worker.j = hm.get(worker.posVis).get(1);
+                            worker.pathIndex++;
+                        }
+                    }
+
+                    if (worker.source == worker.dest) {
+                        worker.pathIndex = 0;
+                        worker.posVis = 0;
+                        worker.arrived = true;
+                        //tiles[worker.i][worker.j].remove(worker);
+                        //várni kellene egy kicsit maybe
+                        tiles[worker.i][worker.j].add(worker);
+                        tiles[worker.i][worker.j].repaint();
+                        getRandomRoad(worker);
+                        worker.path.clear();
+                        //visitor.changeHappiness(10-(10*visitor.getHunger()/100));
+                        //visitor.useRide(payment.getGamesFee());
+                    } else {
+                        tiles[worker.i][worker.j].add(worker);
+                        tiles[worker.i][worker.j].repaint();
+                    }
+                } else { // mechanic
+                    tiles[worker.i][worker.j].remove(worker);
+                    tiles[worker.i][worker.j].repaint();
+
+                    int[] buildingCoordinates = new int[2];
+                    buildingCoordinates[0] = (int) worker.randBuilding.getIndexes().get(0).getX();
+                    buildingCoordinates[1] = (int) worker.randBuilding.getIndexes().get(0).getY();
+
+                    hm.forEach((k, Pvalue) -> {
+                        if (Pvalue.get(0).equals(worker.i) && Pvalue.get(1).equals(worker.j)) {
+                            worker.source = k;
+                        }
+                    });
+
+                    hm.forEach((k, Pvalue) -> {
+                        if (Pvalue.get(0).equals(buildingCoordinates[0]) && Pvalue.get(1).equals(buildingCoordinates[1])) {
+                            worker.dest = k;
+                        }
+                    });
+
+                    if (buildingCoordinates[0] != 0 && worker.arrived) {
+                        //path.clear();
+                        worker.printShortestDistance(graph, worker.source, worker.dest, v);
+                        //System.out.println(randBuilding.getName());
+                        //System.out.println(graph);
+                        //System.out.println(dest);
+                        worker.arrived = false;
+                    }
+                    if (!worker.arrived) {
+                        if ((worker.path.size() - 1 - worker.pathIndex) >= 0) {
+                            worker.posVis = worker.path.get(worker.path.size() - 1 - worker.pathIndex);
+                            worker.i = hm.get(worker.posVis).get(0);
+                            worker.j = hm.get(worker.posVis).get(1);
+                            worker.pathIndex++;
+                        }
+                    }
+
+                    if (worker.source == worker.dest) {
+                        worker.pathIndex = 0;
+                        worker.posVis = 0;
+                        worker.arrived = true;
+                        //tiles[worker.i][worker.j].remove(worker);
+                        //várni kellene egy kicsit maybe
+                        tiles[worker.i][worker.j].add(worker);
+                        tiles[worker.i][worker.j].repaint();
+                        getRandomBuild(worker);
+                        worker.path.clear();
+                        //visitor.changeHappiness(10-(10*visitor.getHunger()/100));
+                        //visitor.useRide(payment.getGamesFee());
+                    } else {
+                        tiles[worker.i][worker.j].add(worker);
+                        tiles[worker.i][worker.j].repaint();
                     }
                 }
 
-                if (worker.source == worker.dest) {
-                    worker.pathIndex = 0;
-                    worker.posVis = 0;
-                    worker.arrived = true;
-                    //tiles[worker.i][worker.j].remove(worker);
-                    //várni kellene egy kicsit maybe
-                    tiles[worker.i][worker.j].add(worker);
-                    tiles[worker.i][worker.j].repaint();
-                    getRandomRoad(worker);
-                    worker.path.clear();
-                    //visitor.changeHappiness(10-(10*visitor.getHunger()/100));
-                    //visitor.useRide(payment.getGamesFee());
-                } else {
-                    tiles[worker.i][worker.j].add(worker);
-                    tiles[worker.i][worker.j].repaint();
-                }
             }
             //System.out.printf("------\n");
         }
@@ -811,13 +944,9 @@ public class GameEngine {
                             }
                         });
                         if (keresett == visitor.dest) {
-                            if (buildings.get(modelTiles
-                                    [(int) visitor.randBuilding.getIndexes().get(0).getX()]
-                                    [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                            if (buildings.get(modelTiles[(int) visitor.randBuilding.getIndexes().get(0).getX()][(int) visitor.randBuilding.getIndexes().get(0).getY()]
                                     .getIndex()) instanceof Ride) {
-                                Ride ride = (Ride) buildings.get(modelTiles
-                                        [(int) visitor.randBuilding.getIndexes().get(0).getX()]
-                                        [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                                Ride ride = (Ride) buildings.get(modelTiles[(int) visitor.randBuilding.getIndexes().get(0).getX()][(int) visitor.randBuilding.getIndexes().get(0).getY()]
                                         .getIndex());
                                 if (ride.getCurrentState() == BuildingState.ACTIVE) {
                                     visitor.posVis = visitor.path.get(visitor.path.size() - 1 - visitor.pathIndex);
@@ -828,13 +957,9 @@ public class GameEngine {
                                     ride.changeState(BuildingState.IN_USE);
                                     buildings.set(modelTiles[visitor.i][visitor.j].getIndex(), ride);
                                 }
-                            }else if (buildings.get(modelTiles
-                                    [(int) visitor.randBuilding.getIndexes().get(0).getX()]
-                                    [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                            } else if (buildings.get(modelTiles[(int) visitor.randBuilding.getIndexes().get(0).getX()][(int) visitor.randBuilding.getIndexes().get(0).getY()]
                                     .getIndex()) instanceof Restaurant) {
-                                Restaurant restaurant = (Restaurant) buildings.get(modelTiles
-                                        [(int) visitor.randBuilding.getIndexes().get(0).getX()]
-                                        [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                                Restaurant restaurant = (Restaurant) buildings.get(modelTiles[(int) visitor.randBuilding.getIndexes().get(0).getX()][(int) visitor.randBuilding.getIndexes().get(0).getY()]
                                         .getIndex());
                                 if (restaurant.getCurrentState() == BuildingState.ACTIVE) {
                                     visitor.posVis = visitor.path.get(visitor.path.size() - 1 - visitor.pathIndex);
@@ -845,13 +970,9 @@ public class GameEngine {
                                     restaurant.changeState(BuildingState.IN_USE);
                                     buildings.set(modelTiles[visitor.i][visitor.j].getIndex(), restaurant);
                                 }
-                            }else if (buildings.get(modelTiles
-                                    [(int) visitor.randBuilding.getIndexes().get(0).getX()]
-                                    [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                            } else if (buildings.get(modelTiles[(int) visitor.randBuilding.getIndexes().get(0).getX()][(int) visitor.randBuilding.getIndexes().get(0).getY()]
                                     .getIndex()) instanceof Toilet) {
-                                Toilet toilet = (Toilet) buildings.get(modelTiles
-                                        [(int) visitor.randBuilding.getIndexes().get(0).getX()]
-                                        [(int) visitor.randBuilding.getIndexes().get(0).getY()]
+                                Toilet toilet = (Toilet) buildings.get(modelTiles[(int) visitor.randBuilding.getIndexes().get(0).getX()][(int) visitor.randBuilding.getIndexes().get(0).getY()]
                                         .getIndex());
                                 if (toilet.getCurrentState() == BuildingState.ACTIVE) {
                                     visitor.posVis = visitor.path.get(visitor.path.size() - 1 - visitor.pathIndex);

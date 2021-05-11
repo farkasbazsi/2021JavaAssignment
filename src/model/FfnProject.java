@@ -289,7 +289,7 @@ public class FfnProject extends JFrame {
                 engine.fireCleaner();
             }
         });
-        
+
         JButton newMechanicButton = new JButton();
         newMechanicButton.setText("+Szerelő");
         newMechanicButton.setPreferredSize(new Dimension(120, 30));
@@ -298,10 +298,14 @@ public class FfnProject extends JFrame {
         newMechanicButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //engine.fireCleaner();
+                try {
+                    engine.newMechanic();
+                } catch (IOException ex) {
+                    Logger.getLogger(FfnProject.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
         });
-        
+
         JButton fireMechanicButton = new JButton();
         fireMechanicButton.setText("-Szerelő");
         fireMechanicButton.setPreferredSize(new Dimension(120, 30));
@@ -310,7 +314,7 @@ public class FfnProject extends JFrame {
         fireMechanicButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //engine.fireCleaner();
+                engine.fireMechanic();
             }
         });
 
