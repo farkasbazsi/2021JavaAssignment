@@ -2,6 +2,7 @@ package game;
 
 import java.awt.Image;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.swing.JPanel;
 import model.Details;
 import model.ModelTile;
@@ -10,6 +11,7 @@ import model.building.Plant;
 import model.building.Restaurant;
 import model.building.Ride;
 import model.building.Road;
+import model.worker.Worker;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
@@ -26,9 +28,7 @@ public class GameEngineTest {
         engine.building = new Ride(new Details("target.png", 2, 2), 15, "target_shooting");
     }
 
-    /**
-     * Doesnt test for out of bounds and overlapping placement
-     */
+
     @Test
     public void testNearRoad() {
         assertFalse(engine.nearRoad(10, 20));
@@ -74,4 +74,25 @@ public class GameEngineTest {
 
         assertEquals(1000, engine.getParkValue());
     }
+    
+    @Test
+    public void testAddCleaner() throws IOException{
+        engine.newCleaner();
+        assertEquals(engine.getWorkers().size(),1);
+    }
+    
+    @Test
+    public void testFireCleaner1() throws IOException{
+        engine.newCleaner();
+        engine.fireCleaner();
+        assertEquals(engine.getWorkers().size(),0);
+    }
+    
+    @Test
+    public void testFireCleaner2() throws IOException{
+        engine.fireCleaner();
+        assertEquals(engine.getWorkers().size(),0);
+    }
+   
+    
 }
