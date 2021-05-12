@@ -13,7 +13,6 @@ public class Tile extends JPanel {
     public Tile(Image m) {
         image = m;
 
-        //if you dont set the size here the whole center panel gets fucked up
         this.setPreferredSize(new Dimension(32, 32));
     }
 
@@ -27,7 +26,7 @@ public class Tile extends JPanel {
         this.image = image;
         this.setPreferredSize(new Dimension(32, 32));
     }
-    
+
     public Image getImage() {
         return image;
     }

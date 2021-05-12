@@ -6,7 +6,7 @@ import model.Details;
 
 public abstract class Building {
 
-    private Details details;
+    private final Details details;
     protected int BUILDING_COST;
     protected String name;
     protected ArrayList<Point> indexes;
@@ -17,7 +17,7 @@ public abstract class Building {
         this.name = name;
         this.indexes = new ArrayList<>();
     }
-    
+
     public Details getDetails() {
         return details;
     }

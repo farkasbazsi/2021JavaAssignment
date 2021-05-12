@@ -13,7 +13,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Random;
-import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
@@ -58,7 +57,7 @@ public class GameEngine {
     private Hashtable<Integer, ArrayList<Integer>> hm = new Hashtable<>();
     private int v = 1;
     ArrayList<ArrayList<Integer>> graph
-            = new ArrayList<ArrayList<Integer>>();
+            = new ArrayList<>();
     int parentRoadKey = 0;
     int parentRoadI = 0;
     int parentRoadJ = 0;
@@ -81,7 +80,7 @@ public class GameEngine {
 
     private ArrayList<Building> wrongBuildings = new ArrayList<>();
 
-    ArrayList<Integer> activateInd = new ArrayList<Integer>();
+    ArrayList<Integer> activateInd = new ArrayList<>();
 
     //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
@@ -141,7 +140,6 @@ public class GameEngine {
         isOpen = true;
         newVisitor();
         repair.start();
-        //mechanicT.start();
     }
 
     /**
@@ -151,7 +149,6 @@ public class GameEngine {
      */
     private void newVisitor() throws IOException {
         Details dt = new Details("res/happy_man.png", 10, 10);
-        //BufferedImage icon = (BufferedImage) ResourceLoader.loadImage("res/happy_man.png");
 
         Visitor visitor = new Visitor(dt/*, icon*/);
         visitor.setBackground(visitor.getHappiness() < 40 ? Color.RED : visitor.getHappiness() > 70 ? Color.GREEN : Color.YELLOW);
@@ -161,7 +158,6 @@ public class GameEngine {
         arrival.start();
         getRandomElement(visitor);
 
-        //a belépődíjból lejön a fenntartási költség (kezdetleges)
         int sum = 0;
         for (Building b : buildings) {
             if (b != null && !(b instanceof Road)) {
@@ -411,11 +407,11 @@ public class GameEngine {
         hm.put(v, newNode);
 
         if (v == 1) {
-            graph.add(new ArrayList<Integer>());
-            graph.add(new ArrayList<Integer>());
+            graph.add(new ArrayList<>());
+            graph.add(new ArrayList<>());
             addEdge(graph, 0, v);
         } else {
-            graph.add(new ArrayList<Integer>());
+            graph.add(new ArrayList<>());
             if (iSubstitute + 1 <= 22 && iSubstitute - 1 >= 0) {
                 if ("road".equals(modelTiles[iSubstitute + 1][jSubstitute].getType())) {
                     parentRoadI = iSubstitute + 1;
@@ -476,7 +472,6 @@ public class GameEngine {
             parentRoadKey = 0;
         }
         v++;
-        //System.out.println(graph);
     }
 
     /**
@@ -489,9 +484,6 @@ public class GameEngine {
      * @param jSubstitute, j index of matrixes.
      */
     private void removeBuilding(int iSubstitute, int jSubstitute) {
-        /*for (Point i : buildings.get(modelTiles[iSubstitute][jSubstitute].getIndex()).getIndexes()) {
-                        System.out.println(i.toString() + "\n");
-                    }*/
         int tempIndex = modelTiles[iSubstitute][jSubstitute].getIndex();
         for (Point i : buildings.get(modelTiles[iSubstitute][jSubstitute].getIndex()).getIndexes()) {
             try {
@@ -554,14 +546,6 @@ public class GameEngine {
         return freeGames;
     }
 
-    private void newGame() {
-
-    }
-
-    private void exit() {
-
-    }
-
     public void newCleaner() throws IOException {
         Details dt = new Details("res/cleaner.png", 10, 10);
         BufferedImage icon = (BufferedImage) ResourceLoader.loadImage(dt.image);
@@ -583,13 +567,11 @@ public class GameEngine {
             tiles[workers.get(0).i][workers.get(0).j].repaint();
             workers.remove(0);
         }
-        System.out.print(workers.size());
     }
 
     public void fireMechanic() {
         if (workers.size() > 0) {
             if (workers.get(1).getRandBuilding() instanceof Ride) {
-                //Ride ride = (Ride) workers.get(1).getRandBuilding();
                 Ride ride = (Ride) buildings.get(modelTiles[workers.get(1).getRandBuilding().getIndexes().get(0).x][workers.get(1).getRandBuilding().getIndexes().get(0).y].getIndex());
                 ride.changeState(BuildingState.NEED_TO_REPAIR);
                 buildings.set(modelTiles[workers.get(1).getRandBuilding().getIndexes().get(0).x][workers.get(1).getRandBuilding().getIndexes().get(0).y].getIndex(), ride);
@@ -599,10 +581,6 @@ public class GameEngine {
             workers.remove(1);
         }
         System.out.print(workers.size());
-    }
-
-    private void removeWorker(int id) {
-
     }
 
     public void printModel(ModelTile[][] tiles) {
@@ -620,7 +598,7 @@ public class GameEngine {
      *
      * @param tiles
      * @param name
-     * @param h, heigth
+     * @param h, height
      * @param l, length
      */
     public int[] findBuilding(ModelTile[][] tiles, Building name, int h, int l) {
@@ -744,15 +722,12 @@ public class GameEngine {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             for (Worker worker : workers) {
-                //System.out.printf(worker.randBuilding.toString());
                 if (worker instanceof Cleaner) {
                     Road i = (Road) buildings.get(modelTiles[worker.i][worker.j].getIndex());
                     boolean x = i.hasTrashOnIt();
                     if (x) {
-                        //buildings.get(modelTiles[worker.i][worker.j].getIndex()).setTrashOnIt(false);
                         i.setTrashOnIt(false);
                         try {
-                            //Image image = new Image(ResourceLoader.loadImage("res/grass.png"));
                             tiles[worker.i][worker.j].setImage(ResourceLoader.loadImage("res/road.png"));
                         } catch (IOException ex) {
                             Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
@@ -765,10 +740,6 @@ public class GameEngine {
                     int[] buildingCoordinates = new int[2];
                     buildingCoordinates[0] = (int) worker.randBuilding.getIndexes().get(0).getX();
                     buildingCoordinates[1] = (int) worker.randBuilding.getIndexes().get(0).getY();
-                    //(int)worker.randBuilding.getIndexes().get(0).getY()]; //findBuilding(modelTiles, visitor.randBuilding, visitor.randBuilding.getDetails().height, visitor.randBuilding.getDetails().length);
-                    //System.out.println(buildingCoordinates[0] + " " + buildingCoordinates[1]);
-                    //System.out.println(graph);
-                    //System.out.println(randBuilding.getName());
 
                     hm.forEach((k, Pvalue) -> {
                         if (Pvalue.get(0).equals(worker.i) && Pvalue.get(1).equals(worker.j)) {
@@ -783,11 +754,7 @@ public class GameEngine {
                     });
 
                     if (buildingCoordinates[0] != 0 && worker.arrived) {
-                        //path.clear();
                         worker.printShortestDistance(graph, worker.source, worker.dest, v);
-                        //System.out.println(randBuilding.getName());
-                        //System.out.println(graph);
-                        //System.out.println(dest);
                         worker.arrived = false;
                     }
                     if (!worker.arrived) {
@@ -803,14 +770,10 @@ public class GameEngine {
                         worker.pathIndex = 0;
                         worker.posVis = 0;
                         worker.arrived = true;
-                        //tiles[worker.i][worker.j].remove(worker);
-                        //várni kellene egy kicsit maybe
                         tiles[worker.i][worker.j].add(worker);
                         tiles[worker.i][worker.j].repaint();
                         getRandomRoad(worker);
                         worker.path.clear();
-                        //visitor.changeHappiness(10-(10*visitor.getHunger()/100));
-                        //visitor.useRide(payment.getGamesFee());
                     } else {
                         tiles[worker.i][worker.j].add(worker);
                         tiles[worker.i][worker.j].repaint();
@@ -836,11 +799,7 @@ public class GameEngine {
                     });
 
                     if (buildingCoordinates[0] != 0 && worker.arrived) {
-                        //path.clear();
                         worker.printShortestDistance(graph, worker.source, worker.dest, v);
-                        //System.out.println(randBuilding.getName());
-                        //System.out.println(graph);
-                        //System.out.println(dest);
                         worker.arrived = false;
                     }
                     if (!worker.arrived) {
@@ -853,9 +812,6 @@ public class GameEngine {
                     }
 
                     if (worker.source == worker.dest) {
-
-                        //tiles[worker.i][worker.j].remove(worker);
-                        //várni kellene egy kicsit maybe
                         tiles[worker.i][worker.j].add(worker);
                         tiles[worker.i][worker.j].repaint();
 
@@ -928,9 +884,6 @@ public class GameEngine {
                 tiles[visitor.i][visitor.j].repaint();
 
                 int[] buildingCoordinates = findBuilding(modelTiles, visitor.randBuilding, visitor.randBuilding.getDetails().height, visitor.randBuilding.getDetails().length);
-                //System.out.println(buildingCoordinates[0] + " " + buildingCoordinates[1]);
-                //System.out.println(graph);
-                //System.out.println(randBuilding.getName());
 
                 hm.forEach((k, Pvalue) -> {
                     if (Pvalue.get(0).equals(visitor.i) && Pvalue.get(1).equals(visitor.j)) {
@@ -945,7 +898,6 @@ public class GameEngine {
                 });
 
                 if (buildingCoordinates[0] != 0 && visitor.arrived) {
-                    //path.clear();
                     if (visitor.getHappiness() < 35) {
                         visitor.printShortestDistance(graph, visitor.source, 0, v);
                         visitor.leaving = true;
@@ -953,9 +905,6 @@ public class GameEngine {
                         visitor.printShortestDistance(graph, visitor.source, visitor.dest, v);
                     }
 
-                    //System.out.println(randBuilding.getName());
-                    //System.out.println(graph);
-                    //System.out.println(dest);
                     visitor.arrived = false;
                 }
                 if (!visitor.arrived) {
@@ -979,9 +928,8 @@ public class GameEngine {
                                     visitor.j = hm.get(visitor.posVis).get(1);
                                     visitor.pathIndex++;
 
-                                    //ride.changeState(BuildingState.IN_USE);
                                     ride.incCurrentVisitors();
-                                    //System.out.println("KIIR: " + ride.getTurnsTillStart());
+
                                     if (ride.getCurrentVisitors() == ride.getMaxVisitors()
                                             && toActivateInd.contains(modelTiles[visitor.i][visitor.j].getIndex()) == false
                                             && activateInd.contains(modelTiles[visitor.i][visitor.j].getIndex()) == false) {
@@ -1137,19 +1085,22 @@ public class GameEngine {
                     Ride ride = (Ride) buildings.get(ind);
                     Random rand = new Random();
                     int rand_int = rand.nextInt(100);
-                    ride.changeState(BuildingState.NEED_TO_REPAIR);
-                    for (Point p : ride.getIndexes()) {
-                        try {
-                            tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/construction.png"));
-                            tiles[p.x][p.y].repaint();
-                        } catch (IOException ex) {
-                            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                    if (rand_int < 30) {
+                        ride.changeState(BuildingState.NEED_TO_REPAIR);
+                        for (Point p : ride.getIndexes()) {
+                            try {
+                                tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/construction.png"));
+                                tiles[p.x][p.y].repaint();
+                            } catch (IOException ex) {
+                                Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                         }
+                    } else {
+                        ride.changeState(BuildingState.ACTIVE);
                     }
                     ride.setCurrentVisitors(0);
                     ride.setTurnsTillStart(10);
                     buildings.set(ind, ride);
-                    //System.out.println(ride.getCurrentState());
                 } else if (buildings.get(ind) instanceof Restaurant) {
                     Restaurant restaurant = (Restaurant) buildings.get(ind);
                     restaurant.changeState(BuildingState.ACTIVE);
@@ -1190,15 +1141,6 @@ public class GameEngine {
          */
         @Override
         public void mouseClicked(MouseEvent e) {
-            /*for(Building i : buildings){
-                if(i!=null){
-                    System.out.println(i.getName()+"\n");
-                }else{
-                    System.out.println("NULL\n");
-                }
-            }
-            System.out.println("----------");*/
-            //System.out.println(modelTiles[iSubstitute][jSubstitute].getIndex() + " " + modelTiles[iSubstitute][jSubstitute].getType());
             if (destroy && !"grass".equals(modelTiles[iSubstitute][jSubstitute].getType())) {
                 if (iSubstitute != 22 || jSubstitute != 12) {
                     removeBuilding(iSubstitute, jSubstitute);
@@ -1208,7 +1150,6 @@ public class GameEngine {
                 if (money - building.getBUILDING_COST() >= 0) {
                     if (iSubstitute + building.getDetails().height < height + 1
                             && jSubstitute + building.getDetails().length < width + 1) {
-                        //System.out.println(iSubstitute + " " + jSubstitute + " : " + buildingHeight + " " + buildingWidth);
 
                         boolean free = true;
                         for (int k = 0; k <= building.getDetails().height - 1; k++) {
@@ -1270,7 +1211,6 @@ public class GameEngine {
     public void visualizePlacing(int iSubstitute, int jSubstitute, Image image) {
         for (int k = 0; k <= building.getDetails().height - 1; k++) {
             for (int l = 0; l <= building.getDetails().length - 1; l++) {
-                //if (iSubstitute + k < height + 1 && jSubstitute + l < width + 1) {
                 if (iSubstitute + k < height && jSubstitute + l < width) {
                     if ("grass".equals(modelTiles[iSubstitute + k][jSubstitute + l].getType())) {
                         tiles[iSubstitute + k][jSubstitute + l].setImage(image);

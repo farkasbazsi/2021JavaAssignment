@@ -10,9 +10,8 @@ import model.building.Building;
 
 public abstract class Worker extends JPanel {
 
-    private Details details;
-    private BufferedImage image;
-    private int workingSpeed;
+    private final Details details;
+    private final BufferedImage image;
 
     public LinkedList<Integer> path = new LinkedList<Integer>();
     public boolean arrived = true;
@@ -40,16 +39,10 @@ public abstract class Worker extends JPanel {
     public Building getRandBuilding() {
         return randBuilding;
     }
-    
+
     public Details getDetails() {
         return details;
     }
-
-    public void checkSalary() {
-
-    }
-
-    abstract void findPath();
 
     public void printShortestDistance(
             ArrayList<ArrayList<Integer>> adj,
@@ -73,15 +66,6 @@ public abstract class Worker extends JPanel {
             path.add(pred[crawl]);
             crawl = pred[crawl];
         }
-
-        // Print distance
-        //System.out.println("Shortest path length is: " + dist[dest]);
-        // Print path
-        //System.out.println("Path is ::");
-        //for (int i = path.size() - 1; i >= 0; i--) {
-        //    System.out.print(path.get(i) + " ");
-        //}
-        //path.clear();
     }
 
     // a modified version of BFS that stores predecessor

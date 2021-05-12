@@ -4,13 +4,11 @@ import model.Details;
 
 public class Toilet extends Building {
 
-    //private boolean free;
     private BuildingState currentState;
 
     public Toilet(Details details, int bcost, String name) {
         super(details, bcost, name);
         currentState = BuildingState.ACTIVE;
-        //free = true;
     }
 
     public Toilet(Toilet toilet) {
@@ -24,10 +22,6 @@ public class Toilet extends Building {
 
     public BuildingState getCurrentState() {
         return currentState;
-    }
-
-    public void usedByVisitor() {
-
     }
 
 }

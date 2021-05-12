@@ -23,10 +23,10 @@ public class Payment {
     }
 
     /**
-     * When the player wants to change the fees these functions are called.
-     * The setFee functions are almost the same, the difference is the given
-     * fee and the text.
-     * 
+     * When the player wants to change the fees these functions are called. The
+     * setFee functions are almost the same, the difference is the given fee and
+     * the text.
+     *
      * @param scale the maximum value which the given fee can be
      */
     public void setEntranceFee(int scale) {
@@ -132,6 +132,5 @@ public class Payment {
     public int getToiletFee() {
         return toiletFee;
     }
-    
-    
+
 }

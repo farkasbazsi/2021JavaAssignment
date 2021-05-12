@@ -1,7 +1,6 @@
 package game;
 
 import java.awt.Image;
-import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JPanel;
@@ -13,7 +12,6 @@ import model.building.Plant;
 import model.building.Restaurant;
 import model.building.Ride;
 import model.building.Road;
-import model.worker.Worker;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.BeforeClass;
@@ -30,7 +28,6 @@ public class GameEngineTest {
         engine.building = new Ride(new Details("target.png", 2, 2), 15, "target_shooting");
     }
 
-
     @Test
     public void testNearRoad() {
         assertFalse(engine.nearRoad(10, 20));
@@ -40,11 +37,9 @@ public class GameEngineTest {
     @Test
     public void testVisualizePlacing() throws IOException {
         Image image = ResourceLoader.loadImage("res/target.png");
-        //Image entrance = ResourceLoader.loadImage("res/entrance.png");
         engine.visualizePlacing(21, 11, image);
 
         assertEquals(image, engine.tiles[21][11].getImage());
-        //assertEquals(entrance,engine.tiles[22][12].getImage());
     }
 
     @Test
@@ -67,35 +62,36 @@ public class GameEngineTest {
 
         assertEquals(1000, engine.getParkValue());
     }
-    
+
     @Test
-    public void testAddCleaner() throws IOException{
+    public void testAddCleaner() throws IOException {
         engine.newCleaner();
-        assertEquals(engine.getWorkers().size(),1);
+        assertEquals(engine.getWorkers().size(), 1);
     }
-    
+
     @Test
-    public void testFireCleaner1() throws IOException{
+    public void testFireCleaner1() throws IOException {
         engine.newCleaner();
         engine.fireCleaner();
-        assertEquals(engine.getWorkers().size(),0);
+        assertEquals(engine.getWorkers().size(), 0);
     }
-    
+
     @Test
-    public void testFireCleaner2() throws IOException{
+    public void testFireCleaner2() throws IOException {
         engine.fireCleaner();
-        assertEquals(engine.getWorkers().size(),0);
+        assertEquals(engine.getWorkers().size(), 0);
     }
-   
+
     @Test
-    public void testInitBuilding() throws IOException{
+    public void testInitBuilding() throws IOException {
         ArrayList buildings = new ArrayList<>();
         ModelTile[][] modelTiles = new ModelTile[25][25];
         Tile tiles[][] = new Tile[25][25];
         for (int i = 0; i < 25; i++) {
             for (int j = 0; j < 25; j++) {
                 if (i == 22 && j == 12) {
-                    buildings.add(new Building(new Details("test.png",0,0), 10, "test") {});
+                    buildings.add(new Building(new Details("test.png", 0, 0), 10, "test") {
+                    });
                     modelTiles[i][j] = new ModelTile("road");
                     modelTiles[i][j].setIndex(0);
                     ArrayList<Integer> newNode = new ArrayList<>();
@@ -108,7 +104,7 @@ public class GameEngineTest {
                 }
             }
         }
-        assertEquals(buildings.size(),1);
+        assertEquals(buildings.size(), 1);
     }
-    
+
 }

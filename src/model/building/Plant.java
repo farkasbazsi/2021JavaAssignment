@@ -13,7 +13,7 @@ public class Plant extends Building {
 
     public Plant(Plant plant) {
         super(plant.getDetails(), plant.getBUILDING_COST(), plant.getName());
-        this.happinessFactor=plant.getHappinessFactor();
+        this.happinessFactor = plant.getHappinessFactor();
     }
 
     public int getHappinessFactor() {

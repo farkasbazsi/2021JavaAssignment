@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Random;
 import javax.accessibility.AccessibleContext;
 import javax.swing.JPanel;
 import javax.swing.Timer;
@@ -50,9 +49,8 @@ public class Visitor extends JPanel {
     public int tilesUntillTrash;
     public boolean leaving;
 
-    public Visitor(Details details/*, BufferedImage image*/) {
+    public Visitor(Details details) {
         this.details = details;
-        //this.image = image;
         timer = new Timer(1000, new visitorTimer());
         timer.start();
         subTimer = new Timer(1000, new subTimer());
@@ -92,7 +90,7 @@ public class Visitor extends JPanel {
         if (happiness + amount >= 100) {
             happiness = 100;
         } else if (happiness + amount <= 0) {
-            happiness = 0; // Tiszta én
+            happiness = 0;
         } else {
             happiness += amount;
         }
@@ -113,7 +111,7 @@ public class Visitor extends JPanel {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            //System.out.println("Money: "+money+" Happiness: "+happiness+" Hunger: "+hunger);
+
         }
     }
 
@@ -164,15 +162,6 @@ public class Visitor extends JPanel {
             path.add(pred[crawl]);
             crawl = pred[crawl];
         }
-
-        // Print distance
-        //System.out.println("Shortest path length is: " + dist[dest]);
-        // Print path
-        //System.out.println("Path is ::");
-        //for (int i = path.size() - 1; i >= 0; i--) {
-        //    System.out.print(path.get(i) + " ");
-        //}
-        //path.clear();
     }
 
     // a modified version of BFS that stores predecessor
@@ -394,6 +383,5 @@ public class Visitor extends JPanel {
     public void setAccessibleContext(AccessibleContext accessibleContext) {
         this.accessibleContext = accessibleContext;
     }
-    
-    
+
 }

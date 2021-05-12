@@ -28,7 +28,7 @@ public class FfnProject extends JFrame {
     private final JPanel eastPanel;
 
     private final ArrayList<Building> buildingList = new ArrayList<>();
-    private ArrayList<JButton> buttons = new ArrayList<>();
+    private final ArrayList<JButton> buttons = new ArrayList<>();
     private int chosenIndex;
 
     private Timer playTimer;
@@ -80,7 +80,7 @@ public class FfnProject extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent event) {
-                //exitConfirmation();
+                exitConfirmation();
             }
         });
 
@@ -91,15 +91,12 @@ public class FfnProject extends JFrame {
         playTimer = new Timer(100, new playTimerListener());
         playTimer.start();
 
-        //Test phase
-        //BEGIN
         gameTime = new Timer(1000, new gameTimerListener());
-        //END
 
         URL url = getClass().getResource("../res/dojo.png");
         setIconImage(Toolkit.getDefaultToolkit().getImage(url));
 
-        setSize(1080, 1920); //1200,850
+        setSize(1080, 1920);
         setResizable(false);
         pack();
         setLocationRelativeTo(null);
@@ -187,7 +184,7 @@ public class FfnProject extends JFrame {
         buttonPanel.setBackground(Color.LIGHT_GRAY);
         JPanel checkPanel = new JPanel();
         checkPanel.setBackground(Color.LIGHT_GRAY);
-        checkPanel.setPreferredSize(new Dimension(170, 50));//170, 150 a munkás buttonok felvételekor változott
+        checkPanel.setPreferredSize(new Dimension(170, 50));
         JLabel checkLabel = new JLabel("<html><div style='text-align: center;'>"
                 + "A belépődíj<br>az alábbi játékokat<br>tartalmazza</html>");
         Border border = checkLabel.getBorder();
@@ -199,7 +196,7 @@ public class FfnProject extends JFrame {
 
         JLabel eastLabel = new JLabel("Beállítások");
         eastLabel.setFont(new Font("Calibri", Font.BOLD, 16));
-        eastLabel.setPreferredSize(new Dimension(170, 50)); // 170, 80 a munkás buttonok felvételekor változott
+        eastLabel.setPreferredSize(new Dimension(170, 50));
         eastLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JButton entranceFeebutton = new JButton();
@@ -410,7 +407,6 @@ public class FfnProject extends JFrame {
                         + buildingList.get(i).getBUILDING_COST() + "Ft");
                 button.setContentAreaFilled(false);
                 button.setPreferredSize(new Dimension(70, 90));
-                //if u try the listener with "i", it doesnt work
                 int iSubstitute = i;
                 button.addActionListener(new ActionListener() {
                     @Override
@@ -488,11 +484,11 @@ public class FfnProject extends JFrame {
     }
 
     private void exitConfirmation() {
-        Object[] buttons = {"Igen", "Nem"};
+        Object[] btns = {"Igen", "Nem"};
         int choice = JOptionPane.showOptionDialog(this, "Valóban ki akar lépni?",
                 "Megerősítés",
                 JOptionPane.DEFAULT_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                buttons, buttons[1]);
+                btns, btns[1]);
         if (choice == 0) {
             System.exit(0);
         }
