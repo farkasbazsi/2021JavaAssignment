@@ -1,11 +1,13 @@
 package game;
 
 import java.awt.Image;
+import java.awt.Point;
 import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JPanel;
 import model.Details;
 import model.ModelTile;
+import model.Tile;
 import model.building.Building;
 import model.building.Plant;
 import model.building.Restaurant;
@@ -42,17 +44,8 @@ public class GameEngineTest {
         engine.visualizePlacing(21, 11, image);
 
         assertEquals(image, engine.tiles[21][11].getImage());
-        //cant test this without third party tester
         //assertEquals(entrance,engine.tiles[22][12].getImage());
     }
-
-    /*
-    @Test
-    public void testFindBuilding(){
-        Building b = engine.building;
-        ModelTile[][] m = engine.modelTiles;
-        int[] i = engine.findBuilding(m, b, 2, 2);
-    }*/
 
     @Test
     public void testGetParkValue() {
@@ -94,5 +87,28 @@ public class GameEngineTest {
         assertEquals(engine.getWorkers().size(),0);
     }
    
+    @Test
+    public void testInitBuilding() throws IOException{
+        ArrayList buildings = new ArrayList<>();
+        ModelTile[][] modelTiles = new ModelTile[25][25];
+        Tile tiles[][] = new Tile[25][25];
+        for (int i = 0; i < 25; i++) {
+            for (int j = 0; j < 25; j++) {
+                if (i == 22 && j == 12) {
+                    buildings.add(new Building(new Details("test.png",0,0), 10, "test") {});
+                    modelTiles[i][j] = new ModelTile("road");
+                    modelTiles[i][j].setIndex(0);
+                    ArrayList<Integer> newNode = new ArrayList<>();
+                    newNode.add(i);
+                    newNode.add(j);
+
+                } else {
+                    modelTiles[i][j] = new ModelTile("grass");
+                    tiles[i][j] = new Tile(ResourceLoader.loadImage("res/Grass.png"));
+                }
+            }
+        }
+        assertEquals(buildings.size(),1);
+    }
     
 }
