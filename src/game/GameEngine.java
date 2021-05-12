@@ -68,9 +68,8 @@ public class GameEngine {
     int hmDeleteIndex;
 
     Timer t = new Timer(700, new visitorTimer());//1500 testing, 700 original
-    Timer arrival = new Timer(5000, new arrivalTimer());
+    Timer arrival = new Timer(5000, new arrivalTimer());//5000 original
     Timer repair = new Timer(10000, new repairTimer());
-    //Timer mechanicT = new Timer(100, new mechanicTimer());
 
     private boolean edge = false;
 
@@ -181,7 +180,7 @@ public class GameEngine {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            if (visitors.size() < 5) {
+            if (visitors.size() < 15) {
                 try {
                     newVisitor();
                 } catch (IOException ex) {
@@ -374,26 +373,8 @@ public class GameEngine {
         workers.add(mc);
 
         getRandomBuild(mc);
-        System.out.print(workers.size());
     }
 
-    /*
-    private class mechanicTimer implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            for(Building build : buildings) {
-                for(Point p : build.getIndexes()) {
-                    try {
-                        tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/construction.png"));
-                    } catch (IOException ex) {
-                        Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        }
-    }
-     */
     private class repairTimer implements ActionListener {
 
         @Override
@@ -606,7 +587,13 @@ public class GameEngine {
     }
 
     public void fireMechanic() {
-        if (workers.size() > 1) {
+        if (workers.size() > 0) {
+            if (workers.get(1).getRandBuilding() instanceof Ride) {
+                //Ride ride = (Ride) workers.get(1).getRandBuilding();
+                Ride ride = (Ride) buildings.get(modelTiles[workers.get(1).getRandBuilding().getIndexes().get(0).x][workers.get(1).getRandBuilding().getIndexes().get(0).y].getIndex());
+                ride.changeState(BuildingState.NEED_TO_REPAIR);
+                buildings.set(modelTiles[workers.get(1).getRandBuilding().getIndexes().get(0).x][workers.get(1).getRandBuilding().getIndexes().get(0).y].getIndex(), ride);
+            }
             tiles[workers.get(1).i][workers.get(1).j].remove(workers.get(1));
             tiles[workers.get(1).i][workers.get(1).j].repaint();
             workers.remove(1);
@@ -705,12 +692,14 @@ public class GameEngine {
     }
 
     private void getRandomBuild(Worker worker) {
-        for (Building build : buildings) {
-            if (build instanceof Ride) {
-                Ride ride = (Ride) build;
+        for (int i = 0; i < buildings.size(); i++) {
+            if (buildings.get(i) instanceof Ride) {
+                Ride ride = (Ride) buildings.get(i);
                 if (ride.getCurrentState().equals(BuildingState.NEED_TO_REPAIR)) {
                     ride.changeState(BuildingState.REPAIRING);
+                    buildings.set(i, ride);
                     worker.randBuilding = ride;
+                    break;
                 }
             }
         }
@@ -721,7 +710,8 @@ public class GameEngine {
                     worker.randBuilding = buildings.get(rand.nextInt(buildings.size()));
                 } while (worker.randBuilding == null);
             } while (!(worker.randBuilding instanceof Road) || (worker.prevBuild[0] == worker.randBuilding.getIndexes().get(0).x
-                    && worker.prevBuild[1] == worker.randBuilding.getIndexes().get(0).y));
+                    && worker.prevBuild[1] == worker.randBuilding.getIndexes().get(0).y
+                    || worker.randBuilding.getIndexes().get(0).x == 22 && worker.randBuilding.getIndexes().get(0).y == 12));
             worker.prevBuild[0] = worker.randBuilding.getIndexes().get(0).x;
             worker.prevBuild[1] = worker.randBuilding.getIndexes().get(0).y;
         }
@@ -863,39 +853,37 @@ public class GameEngine {
                     }
 
                     if (worker.source == worker.dest) {
-                        worker.pathIndex = 0;
-                        worker.posVis = 0;
-                        worker.arrived = true;
+
                         //tiles[worker.i][worker.j].remove(worker);
                         //várni kellene egy kicsit maybe
                         tiles[worker.i][worker.j].add(worker);
                         tiles[worker.i][worker.j].repaint();
-                        getRandomBuild(worker);
-                        worker.path.clear();
-                        //visitor.changeHappiness(10-(10*visitor.getHunger()/100));
-                        //visitor.useRide(payment.getGamesFee());
+
                         if (buildings.get(modelTiles[worker.i][worker.j].getIndex()) instanceof Ride) {
-                            Timer delay = new Timer(1000, new ActionListener() {
-                                @Override
-                                public void actionPerformed(ActionEvent arg0) {
+                            Ride ri = (Ride) buildings.get(modelTiles[worker.i][worker.j].getIndex());
+                            ri.changeState(BuildingState.ACTIVE);
+                            buildings.set(modelTiles[worker.i][worker.j].getIndex(), ri);
 
-                                    Ride ri = (Ride) buildings.get(modelTiles[worker.i][worker.j].getIndex());
-                                    ri.changeState(BuildingState.ACTIVE);
-                                    buildings.set(modelTiles[worker.i][worker.j].getIndex(), ri);
-
-                                    for (Point p : ri.getIndexes()) {
-                                        try {
-                                            tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/" + ri.getDetails().image));
-                                            tiles[p.x][p.y].repaint();
-                                        } catch (IOException ex) {
-                                            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
-                                        }
-                                    }
-
+                            for (Point p : ri.getIndexes()) {
+                                try {
+                                    tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/" + ri.getDetails().image));
+                                    tiles[p.x][p.y].repaint();
+                                } catch (IOException ex) {
+                                    Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
                                 }
-                            });
-                            delay.setRepeats(false);
-                            delay.start();
+                            }
+
+                            worker.pathIndex = 0;
+                            worker.posVis = 0;
+                            worker.arrived = true;
+                            getRandomBuild(worker);
+                            worker.path.clear();
+                        } else {
+                            worker.pathIndex = 0;
+                            worker.posVis = 0;
+                            worker.arrived = true;
+                            getRandomBuild(worker);
+                            worker.path.clear();
                         }
 
                     } else {
@@ -905,7 +893,6 @@ public class GameEngine {
                 }
 
             }
-            //System.out.printf("------\n");
         }
     }
 
@@ -995,7 +982,9 @@ public class GameEngine {
                                     //ride.changeState(BuildingState.IN_USE);
                                     ride.incCurrentVisitors();
                                     //System.out.println("KIIR: " + ride.getTurnsTillStart());
-                                    if (ride.getCurrentVisitors() == ride.getMaxVisitors()) {
+                                    if (ride.getCurrentVisitors() == ride.getMaxVisitors()
+                                            && toActivateInd.contains(modelTiles[visitor.i][visitor.j].getIndex()) == false
+                                            && activateInd.contains(modelTiles[visitor.i][visitor.j].getIndex()) == false) {
                                         ride.changeState(BuildingState.IN_USE);
                                         toActivateInd.add(modelTiles[visitor.i][visitor.j].getIndex());
 
@@ -1059,7 +1048,9 @@ public class GameEngine {
                     Ride ride = (Ride) buildings.get(i);
                     if (ride.getCurrentVisitors() != 0
                             && ride.getCurrentVisitors() != ride.getMaxVisitors()
-                            && ride.getTurnsTillStart() <= 0) {
+                            && ride.getTurnsTillStart() <= 0
+                            && toActivateInd.contains(i) == false
+                            && activateInd.contains(i) == false) {
                         ride.changeState(BuildingState.IN_USE);
                         toActivateInd.add(i);
                         buildings.set(i, ride);
@@ -1072,15 +1063,11 @@ public class GameEngine {
                         .getIndex()) instanceof Ride) {
                     Ride ride = (Ride) buildings.get(modelTiles[(int) visitorAgain.randBuilding.getIndexes().get(0).getX()][(int) visitorAgain.randBuilding.getIndexes().get(0).getY()]
                             .getIndex());
-                    //System.out.println(visitorAgain.source + ", " + visitorAgain.dest + ", " + ride.getCurrentState());
                     if (visitorAgain.source == visitorAgain.dest && ride.getCurrentState() == BuildingState.ACTIVE) {
-                        //System.out.println("Elotte: " + ride.getTurnsTillStart());
                         ride.decTurnsTillStart();
-                        //System.out.println("Utana: " + ride.getTurnsTillStart());
                         buildings.set(modelTiles[visitorAgain.i][visitorAgain.j].getIndex(), ride);
                     }
                     if (visitorAgain.source == visitorAgain.dest && ride.getCurrentState() == BuildingState.IN_USE) {
-                        //System.out.println("Tovabblepek");
                         if (visitorAgain.getHunger() > 70) {
                             visitorAgain.eatSomething();
                         }
@@ -1150,18 +1137,14 @@ public class GameEngine {
                     Ride ride = (Ride) buildings.get(ind);
                     Random rand = new Random();
                     int rand_int = rand.nextInt(100);
-                    if (rand_int > 30) {
-                        ride.changeState(BuildingState.NEED_TO_REPAIR);
-                        for (Point p : ride.getIndexes()) {
-                            try {
-                                tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/construction.png"));
-                                tiles[p.x][p.y].repaint();
-                            } catch (IOException ex) {
-                                Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
-                            }
+                    ride.changeState(BuildingState.NEED_TO_REPAIR);
+                    for (Point p : ride.getIndexes()) {
+                        try {
+                            tiles[p.x][p.y].setImage(ResourceLoader.loadImage("res/construction.png"));
+                            tiles[p.x][p.y].repaint();
+                        } catch (IOException ex) {
+                            Logger.getLogger(GameEngine.class.getName()).log(Level.SEVERE, null, ex);
                         }
-                    } else {
-                        ride.changeState(BuildingState.ACTIVE);
                     }
                     ride.setCurrentVisitors(0);
                     ride.setTurnsTillStart(10);
@@ -1178,7 +1161,6 @@ public class GameEngine {
                 }
             }
             activateInd.clear();
-            //System.out.println("HOSSZ: " + toActivateInd.size());
             for (Integer ind : toActivateInd) {
                 activateInd.add(ind);
             }

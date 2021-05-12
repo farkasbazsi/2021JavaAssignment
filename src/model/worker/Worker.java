@@ -37,6 +37,10 @@ public abstract class Worker extends JPanel {
         g.drawImage(image, 0, 0, 10, 10, this);
     }
 
+    public Building getRandBuilding() {
+        return randBuilding;
+    }
+    
     public Details getDetails() {
         return details;
     }
