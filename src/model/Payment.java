@@ -1,3 +1,12 @@
+/**
+ * 2020/2021/2
+ * Szoftvertechnológia
+ *
+ * FFN project
+ * Nagy Gergő, Falusi Gergő Gábor, Farkas Balázs
+ *
+ * 2021.05.12.
+ */
 package model;
 
 import java.awt.Dimension;
@@ -42,6 +51,11 @@ public class Payment {
         entranceFee = slider.getValue();
     }
 
+    /**
+     * Sets in the workers fee
+     *
+     * @param scale
+     */
     public void setWorkerFee(int scale) {
         JFrame parent = new JFrame();
 
@@ -55,6 +69,11 @@ public class Payment {
         workerFee = slider.getValue();
     }
 
+    /**
+     * Sets in the games fee
+     *
+     * @param scale
+     */
     public void setGamesFee(int scale) {
         JFrame parent = new JFrame();
 
@@ -68,6 +87,11 @@ public class Payment {
         gamesFee = slider.getValue();
     }
 
+    /**
+     * sets in the restaurants fee
+     *
+     * @param scale
+     */
     public void setRestaurantFee(int scale) {
         JFrame parent = new JFrame();
 
@@ -81,6 +105,11 @@ public class Payment {
         restaurantFee = slider.getValue();
     }
 
+    /**
+     * Sets in the toilets fee
+     *
+     * @param scale
+     */
     public void setToiletFee(int scale) {
         JFrame parent = new JFrame();
 

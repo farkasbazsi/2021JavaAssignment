@@ -1,3 +1,12 @@
+/**
+ * 2020/2021/2
+ * Szoftvertechnológia
+ *
+ * FFN project
+ * Nagy Gergő, Falusi Gergő Gábor, Farkas Balázs
+ *
+ * 2021.05.12.
+ */
 package game;
 
 import java.awt.Color;
@@ -82,7 +91,6 @@ public class GameEngine {
 
     ArrayList<Integer> activateInd = new ArrayList<>();
 
-    //gets called after the centerPanel in FfnProject.java
     public GameEngine(JPanel panel, Building spawnRoad) throws IOException {
         this.money = 10000;
         buildings = new ArrayList<>();
@@ -143,9 +151,10 @@ public class GameEngine {
     }
 
     /**
-     * Insert new visitor into the park.
+     * Insert new visitor into the park. Adds the enterancefee - upkeep to the
+     * players money
      *
-     * @throws IOException
+     * @throws IOException, if the ResourceLoader can't find the picture
      */
     private void newVisitor() throws IOException {
         Details dt = new Details("res/happy_man.png", 10, 10);
@@ -169,7 +178,7 @@ public class GameEngine {
 
     /**
      * Insert new visitor in every five seconds, until the visitors number less
-     * than 5.
+     * than the given number.
      *
      */
     private class arrivalTimer implements ActionListener {
@@ -361,6 +370,11 @@ public class GameEngine {
         }
     }
 
+    /**
+     * Adds in a new mechanic type worker.
+     *
+     * @throws IOException, if the ResourceLoader can't find the picture
+     */
     public void newMechanic() throws IOException {
         Details dt = new Details("res/mechanic.png", 10, 10);
         BufferedImage icon = (BufferedImage) ResourceLoader.loadImage(dt.image);
@@ -371,6 +385,9 @@ public class GameEngine {
         getRandomBuild(mc);
     }
 
+    /**
+     * Timer for repairing
+     */
     private class repairTimer implements ActionListener {
 
         @Override
@@ -513,39 +530,11 @@ public class GameEngine {
         }
     }
 
-    public int getMoney() {
-        return money;
-    }
-
-    public int getVisitorsCount() {
-        return visitors.size();
-    }
-
-    public int getAvgHappiness() {
-        if (visitors.isEmpty()) {
-            return 100;
-        }
-        int sum = 0;
-        for (Visitor visitor : visitors) {
-            sum += visitor.getHappiness();
-        }
-        return sum / visitors.size();
-    }
-
-    public int getParkValue() {
-        int sum = 0;
-        for (Building build : buildings) {
-            if (build != null) {
-                sum += build.getBUILDING_COST();
-            }
-        }
-        return sum;
-    }
-
-    public ArrayList<String> getFreeGames() {
-        return freeGames;
-    }
-
+    /**
+     * Adds in a new cleaner type worker
+     *
+     * @throws IOException, if the ResourceLoader cant't find the picture
+     */
     public void newCleaner() throws IOException {
         Details dt = new Details("res/cleaner.png", 10, 10);
         BufferedImage icon = (BufferedImage) ResourceLoader.loadImage(dt.image);
@@ -561,6 +550,9 @@ public class GameEngine {
         System.out.print(workers.size());
     }
 
+    /**
+     * Removes a cleaner type worker
+     */
     public void fireCleaner() {
         if (workers.size() > 0) {
             tiles[workers.get(0).i][workers.get(0).j].remove(workers.get(0));
@@ -569,28 +561,21 @@ public class GameEngine {
         }
     }
 
+    /**
+     * Removes a mechanic type worker
+     */
     public void fireMechanic() {
         if (workers.size() > 0) {
-            if (workers.get(1).getRandBuilding() instanceof Ride) {
-                Ride ride = (Ride) buildings.get(modelTiles[workers.get(1).getRandBuilding().getIndexes().get(0).x][workers.get(1).getRandBuilding().getIndexes().get(0).y].getIndex());
+            if (workers.get(0).getRandBuilding() instanceof Ride) {
+                Ride ride = (Ride) buildings.get(modelTiles[workers.get(0).getRandBuilding().getIndexes().get(0).x][workers.get(0).getRandBuilding().getIndexes().get(0).y].getIndex());
                 ride.changeState(BuildingState.NEED_TO_REPAIR);
-                buildings.set(modelTiles[workers.get(1).getRandBuilding().getIndexes().get(0).x][workers.get(1).getRandBuilding().getIndexes().get(0).y].getIndex(), ride);
+                buildings.set(modelTiles[workers.get(0).getRandBuilding().getIndexes().get(0).x][workers.get(0).getRandBuilding().getIndexes().get(0).y].getIndex(), ride);
             }
-            tiles[workers.get(1).i][workers.get(1).j].remove(workers.get(1));
-            tiles[workers.get(1).i][workers.get(1).j].repaint();
-            workers.remove(1);
+            tiles[workers.get(0).i][workers.get(0).j].remove(workers.get(0));
+            tiles[workers.get(0).i][workers.get(0).j].repaint();
+            workers.remove(0);
         }
         System.out.print(workers.size());
-    }
-
-    public void printModel(ModelTile[][] tiles) {
-        for (ModelTile[] tile : tiles) {
-            for (ModelTile modelTile : tile) {
-                if (!modelTile.getType().equals("grass")) {
-                    System.out.println(modelTile.getType());
-                }
-            }
-        }
     }
 
     /**
@@ -657,6 +642,11 @@ public class GameEngine {
         return retval;
     }
 
+    /**
+     * Gives back a random road
+     *
+     * @param worker, binds the road to this worker
+     */
     private void getRandomRoad(Worker worker) {
         Random rand = new Random();
         do {
@@ -669,6 +659,11 @@ public class GameEngine {
         worker.prevBuild[1] = worker.randBuilding.getIndexes().get(0).y;
     }
 
+    /**
+     * Gives back a random building
+     *
+     * @param worker, binds the building to this worker
+     */
     private void getRandomBuild(Worker worker) {
         for (int i = 0; i < buildings.size(); i++) {
             if (buildings.get(i) instanceof Ride) {
@@ -714,8 +709,8 @@ public class GameEngine {
         visitor.prevBuild[1] = visitor.randBuilding.getIndexes().get(0).y;
     }
 
-    /*
-        Bugos, ha ki van választva a road akkor nem jelennek meg a bespawnoló cleanerek
+    /**
+     * Timer that moves the workers
      */
     private class workerTimer implements ActionListener {
 
@@ -1275,6 +1270,39 @@ public class GameEngine {
 
     public Payment getPayment() {
         return payment;
+    }
+
+    public int getMoney() {
+        return money;
+    }
+
+    public int getVisitorsCount() {
+        return visitors.size();
+    }
+
+    public int getAvgHappiness() {
+        if (visitors.isEmpty()) {
+            return 100;
+        }
+        int sum = 0;
+        for (Visitor visitor : visitors) {
+            sum += visitor.getHappiness();
+        }
+        return sum / visitors.size();
+    }
+
+    public int getParkValue() {
+        int sum = 0;
+        for (Building build : buildings) {
+            if (build != null) {
+                sum += build.getBUILDING_COST();
+            }
+        }
+        return sum;
+    }
+
+    public ArrayList<String> getFreeGames() {
+        return freeGames;
     }
 
     /**

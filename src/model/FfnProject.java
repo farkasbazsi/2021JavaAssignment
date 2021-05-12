@@ -365,11 +365,17 @@ public class FfnProject extends JFrame {
         eastPanel.add(openbutton);
     }
 
+    /**
+     * Error message if the doesnt contain 5 buildings
+     */
     private void showMessage() {
         JOptionPane.showMessageDialog(this, "A minimális épületszámot (5) el kell érnie a parknak a megnyitáshoz!", "Park megnyitása",
                 JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Updates the south panel
+     */
     private void updateSouthLabelText() {
         southLabel.setText("Egyenleg: " + engine.getMoney() + "Ft       Látogatók száma: "
                 + engine.getVisitorsCount() + " fő       Boldogság szintje: " + engine.getAvgHappiness()
@@ -483,6 +489,9 @@ public class FfnProject extends JFrame {
         westPanel.add(Bbutton);
     }
 
+    /**
+     * Exitconfirmation if you want to leave the game
+     */
     private void exitConfirmation() {
         Object[] btns = {"Igen", "Nem"};
         int choice = JOptionPane.showOptionDialog(this, "Valóban ki akar lépni?",
